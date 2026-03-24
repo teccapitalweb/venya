@@ -6,1178 +6,1036 @@
 <title>¡Ven Ya! — Prototipo</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
-
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 :root{
   --org:#F97316;--org2:#EA6C10;--org-l:#FFF4EE;--org-ll:#FEE9D9;
-  --gray:#6B7280;--gray-l:#F7F7F7;--gray-m:#E5E7EB;--gray-d:#9CA3AF;
+  --gray-l:#F7F7F7;--gray-m:#E5E7EB;--gray-d:#9CA3AF;
   --text:#111827;--text2:#6B7280;--text3:#9CA3AF;
-  --border:#EBEBEB;--white:#FFFFFF;
-  --green:#22C55E;--green-l:#F0FDF4;
+  --border:#EBEBEB;--green:#22C55E;--green-l:#F0FDF4;
 }
-body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#DDDCDB;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:32px 16px;}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#DDDCDB;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;}
 
-/* ─── DEMO WRAPPER ─── */
-.demo-wrapper{display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:900px;}
-.demo-title{font-size:13px;font-weight:600;color:#888;letter-spacing:.08em;text-transform:uppercase;}
-.phones-row{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;align-items:flex-start;}
-.phone-col{display:flex;flex-direction:column;align-items:center;gap:8px;}
-.phone-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.06em;text-transform:uppercase;}
+/* MODE SWITCHER */
+.mode-switch{display:flex;background:#fff;border-radius:14px;padding:5px;gap:4px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
+.mode-btn{padding:10px 24px;border-radius:10px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;}
+.mode-btn.active{background:var(--org);color:#fff;}
 
-/* ─── PHONE FRAME ─── */
-.phone{
-  width:340px;height:720px;
-  background:#fff;
-  border-radius:40px;
-  overflow:hidden;
-  position:relative;
-  box-shadow:0 24px 64px rgba(0,0,0,.2),0 0 0 1px rgba(0,0,0,.06),inset 0 0 0 1px rgba(255,255,255,.5);
-}
+/* PHONE */
+.phone{width:360px;height:740px;background:#fff;border-radius:40px;overflow:hidden;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.22),0 0 0 1px rgba(0,0,0,.06);}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:#fff;overflow:hidden;}
+.screen.active{display:flex;}
 
-/* ─── SCREENS ─── */
-.screen{position:absolute;inset:0;display:flex;flex-direction:column;background:#fff;overflow:hidden;}
-.screen.hide{display:none;}
+/* STATUS BAR */
+.sb{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.sb .time{font-size:13px;font-weight:700;color:var(--text);}
+.sb.white .time{color:#fff;}
+.sb-icons{display:flex;gap:4px;align-items:center;}
 
-/* ─── STATUS BAR ─── */
-.status-bar{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
-.status-bar .time{font-size:13px;font-weight:700;color:var(--text);}
-.status-icons{display:flex;gap:4px;align-items:center;}
+/* TOP BAR */
+.topbar{display:flex;align-items:center;padding:2px 18px 12px;flex-shrink:0;gap:10px;}
+.topbar-title{font-size:17px;font-weight:800;color:var(--text);flex:1;}
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);}
 
-/* ─── TOP BAR ─── */
-.top-bar{display:flex;align-items:center;padding:4px 18px 12px;flex-shrink:0;gap:10px;}
-.top-bar .title{font-size:20px;font-weight:800;color:var(--text);flex:1;}
-.top-bar .subtitle{font-size:13px;font-weight:600;color:var(--text2);flex:1;text-align:center;}
-.icon-btn{width:36px;height:36px;border-radius:10px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:var(--text);}
-
-/* ─── SCROLL CONTENT ─── */
+/* SCROLL */
 .scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
 .scroll::-webkit-scrollbar{display:none;}
 .pad{padding:0 18px;}
 
-/* ─── BOTTOM NAV ─── */
-.bnav{display:flex;background:#fff;border-top:1px solid var(--border);flex-shrink:0;padding:8px 0 16px;}
-.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 0;cursor:pointer;border:none;background:none;font-family:inherit;}
+/* BOTTOM NAV */
+.bnav{display:flex;background:#fff;border-top:1px solid var(--border);flex-shrink:0;padding:8px 0 18px;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;border:none;background:none;font-family:inherit;}
 .bn span{font-size:10px;font-weight:700;color:var(--text3);}
 .bn.active span{color:var(--org);}
-.bn svg{width:22px;height:22px;}
 
-/* ─── TYPOGRAPHY ─── */
-.t-h1{font-size:26px;font-weight:800;color:var(--text);}
-.t-h2{font-size:18px;font-weight:800;color:var(--text);}
-.t-h3{font-size:15px;font-weight:700;color:var(--text);}
-.t-body{font-size:13px;color:var(--text2);line-height:1.55;}
-.t-cap{font-size:11px;color:var(--text3);}
-.t-org{color:var(--org);}
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:14px;border:none;border-radius:13px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .12s,opacity .12s;}
+.btn:active{transform:scale(.97);}
+.btn-p{background:var(--org);color:#fff;}
+.btn-o{background:#fff;color:var(--org);border:1.5px solid var(--org);}
+.btn-g{background:var(--gray-l);color:var(--text);}
+.btn-green{background:var(--green-l);color:#15803D;}
+.btn-sm{padding:9px 14px;font-size:12px;border-radius:10px;}
+.btn-xs{padding:7px 12px;font-size:11px;border-radius:8px;width:auto;}
 
-/* ─── BUTTONS ─── */
-.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:14px;border:none;border-radius:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;transition:transform .12s,opacity .12s;}
-.btn:active{transform:scale(.97);opacity:.9;}
-.btn-primary{background:var(--org);color:#fff;}
-.btn-outline{background:#fff;color:var(--org);border:1.5px solid var(--org);}
-.btn-gray{background:var(--gray-l);color:var(--text);}
-.btn-sm{padding:9px 16px;font-size:12px;font-weight:700;border-radius:10px;}
-.btn-xs{padding:7px 12px;font-size:11px;font-weight:700;border-radius:8px;}
-
-/* ─── INPUTS ─── */
-.input-group{margin-bottom:14px;}
-.lbl{display:block;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px;}
+/* INPUTS */
+.ig{margin-bottom:14px;}
+.lbl{display:block;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;}
 .inp{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;appearance:none;}
 .inp:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(249,115,22,.1);}
 .inp::placeholder{color:var(--text3);}
-.inp-icon{position:relative;}
-.inp-icon .inp{padding-left:42px;}
-.inp-icon svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--text3);}
+.inp-wrap{position:relative;}
+.inp-wrap .inp{padding-left:40px;}
+.inp-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;}
 
-/* ─── ROLE CARDS ─── */
+/* ROLE CARDS */
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
-.role-card{border:1.5px solid var(--border);border-radius:14px;padding:14px;cursor:pointer;transition:all .15s;text-align:center;}
-.role-card.selected{border-color:var(--org);background:var(--org-l);}
-.role-card .rc-icon{width:40px;height:40px;border-radius:12px;background:var(--gray-l);display:flex;align-items:center;justify-content:center;margin:0 auto 8px;}
-.role-card.selected .rc-icon{background:var(--org-ll);}
-.role-card .rc-title{font-size:13px;font-weight:700;color:var(--text);}
-.role-card .rc-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.role-card{border:1.5px solid var(--border);border-radius:13px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;}
+.role-card.sel{border-color:var(--org);background:var(--org-l);}
+.rc-icon{width:38px;height:38px;border-radius:10px;background:var(--gray-l);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;}
+.role-card.sel .rc-icon{background:var(--org-ll);}
+.rc-title{font-size:13px;font-weight:700;color:var(--text);}
+.rc-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 
-/* ─── PLAN CARDS ─── */
+/* PLAN CARDS */
 .plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
-.plan-card{border:1.5px solid var(--border);border-radius:14px;padding:13px;cursor:pointer;transition:all .15s;position:relative;}
-.plan-card.selected{border-color:var(--org);background:var(--org-l);}
-.plan-card .pc-tag{position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--org);color:#fff;font-size:9px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap;}
-.plan-card .pc-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px;}
-.plan-card .pc-price{font-size:11px;color:var(--text3);margin-bottom:8px;}
-.plan-card .pc-feat{font-size:10px;color:var(--text2);line-height:1.8;}
-.plan-card.selected .pc-name{color:var(--org);}
+.plan-card{border:1.5px solid var(--border);border-radius:13px;padding:14px 12px;cursor:pointer;position:relative;transition:all .15s;}
+.plan-card.sel{border-color:var(--org);background:var(--org-l);}
+.pc-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--org);color:#fff;font-size:9px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap;}
+.pc-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.plan-card.sel .pc-name{color:var(--org);}
+.pc-price{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.pc-feat{font-size:10px;color:var(--text2);line-height:1.8;}
 
-/* ─── SEARCH BAR ─── */
-.searchbar{display:flex;align-items:center;gap:10px;background:var(--gray-l);border-radius:14px;padding:11px 14px;margin-bottom:14px;}
+/* SEARCH */
+.searchbar{display:flex;align-items:center;gap:9px;background:var(--gray-l);border-radius:13px;padding:11px 14px;margin-bottom:14px;}
 .searchbar input{background:none;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--text);flex:1;}
 .searchbar input::placeholder{color:var(--text3);}
 
-/* ─── CHIPS / FILTERS ─── */
-.chips-row{display:flex;gap:7px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;}
-.chips-row::-webkit-scrollbar{display:none;}
+/* CHIPS */
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;}
+.chips::-webkit-scrollbar{display:none;}
 .chip{padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;flex-shrink:0;}
 .chip.on{background:var(--org);color:#fff;border-color:var(--org);}
 
-/* ─── PROVIDER CARD ─── */
-.prov-card{display:flex;gap:12px;background:#fff;border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;}
-.prov-avatar{width:52px;height:52px;border-radius:14px;background:var(--gray-l);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-.prov-avatar img{width:100%;height:100%;object-fit:cover;}
-.prov-avatar .initials{font-size:18px;font-weight:800;color:var(--org);}
-.prov-info{flex:1;min-width:0;}
-.prov-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
-.prov-loc{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:3px;margin-bottom:5px;}
-.prov-cat{font-size:10px;font-weight:700;color:var(--org);background:var(--org-l);padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px;}
+/* PROVIDER CARD */
+.pcard{display:flex;gap:12px;background:#fff;border:1px solid var(--border);border-radius:15px;padding:13px;margin-bottom:10px;}
+.pav{width:52px;height:52px;border-radius:13px;background:var(--gray-l);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--org);}
+.pinfo{flex:1;min-width:0;}
+.pname{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ploc{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:3px;margin-bottom:5px;}
+.pcat{font-size:10px;font-weight:700;color:var(--org);background:var(--org-l);padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px;}
 .stars-row{display:flex;align-items:center;gap:4px;}
-.stars{display:flex;gap:1px;}
 .stars svg{width:10px;height:10px;}
-.rating-num{font-size:11px;font-weight:700;color:var(--text);}
-.rating-count{font-size:11px;color:var(--text3);}
-.prov-card-footer{margin-top:8px;display:flex;justify-content:flex-end;}
 
-/* ─── SECTION HEADER ─── */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.sec-hdr .s-title{font-size:14px;font-weight:800;color:var(--text);}
-.sec-hdr .s-link{font-size:12px;font-weight:600;color:var(--org);}
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sh .st{font-size:14px;font-weight:800;color:var(--text);}
+.sh .sl{font-size:12px;font-weight:600;color:var(--org);cursor:pointer;}
 
-/* ─── DIVIDER ─── */
-.divider{height:1px;background:var(--border);margin:14px 0;}
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:14px 0;}
 
-/* ─── BADGES ─── */
-.badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;}
-.badge-green{background:var(--green-l);color:#15803D;}
-.badge-orange{background:var(--org-l);color:var(--org2);}
-.badge-gray{background:var(--gray-l);color:var(--text2);}
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.bg{background:var(--green-l);color:#15803D;}
+.bo{background:var(--org-l);color:var(--org2);}
+.bgr{background:var(--gray-l);color:var(--text2);}
 
-/* ─── PROFILE HEADER ─── */
-.profile-hero{background:var(--gray-l);border-radius:0 0 24px 24px;padding:16px 18px 20px;margin-bottom:16px;flex-shrink:0;}
-.prof-avatar-lg{width:72px;height:72px;border-radius:20px;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:var(--org);margin-bottom:10px;overflow:hidden;}
-.prof-name-lg{font-size:20px;font-weight:800;color:var(--text);margin-bottom:3px;}
-.prof-loc{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-bottom:8px;}
-.prof-stats{display:flex;gap:16px;}
-.prof-stat{text-align:center;}
-.prof-stat .n{font-size:16px;font-weight:800;color:var(--text);}
-.prof-stat .l{font-size:10px;color:var(--text3);}
+/* PROFILE HERO */
+.prof-hero{background:var(--gray-l);border-radius:0 0 22px 22px;padding:14px 18px 18px;flex-shrink:0;}
+.av-lg{width:68px;height:68px;border-radius:18px;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--org);}
+.pname-lg{font-size:19px;font-weight:800;color:var(--text);margin-bottom:2px;}
+.ploc-lg{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+.pstats{display:flex;gap:0;}
+.pstat{flex:1;text-align:center;}
+.pstat .n{font-size:16px;font-weight:800;color:var(--text);}
+.pstat .l{font-size:10px;color:var(--text3);}
 
-/* ─── REVIEW ─── */
-.review{background:var(--gray-l);border-radius:12px;padding:12px;margin-bottom:8px;}
-.review-top{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.review-avatar{width:28px;height:28px;border-radius:99px;background:var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--org);flex-shrink:0;}
-.review-name{font-size:12px;font-weight:700;color:var(--text);}
-.review-date{font-size:10px;color:var(--text3);margin-left:auto;}
-.review-text{font-size:12px;color:var(--text2);line-height:1.5;}
+/* REVIEW */
+.rev{background:var(--gray-l);border-radius:12px;padding:11px;margin-bottom:8px;}
+.rev-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.rev-av{width:26px;height:26px;border-radius:99px;background:var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--org);flex-shrink:0;}
+.rev-name{font-size:12px;font-weight:700;color:var(--text);}
+.rev-date{font-size:10px;color:var(--text3);margin-left:auto;}
+.rev-txt{font-size:12px;color:var(--text2);line-height:1.5;}
 
-/* ─── PRODUCT GRID ─── */
-.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-.prod-card{background:var(--gray-l);border-radius:14px;overflow:hidden;}
-.prod-img{height:80px;background:var(--gray-m);display:flex;align-items:center;justify-content:center;}
+/* PRODUCTS */
+.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+.prod-card{background:var(--gray-l);border-radius:13px;overflow:hidden;}
+.prod-img{height:70px;display:flex;align-items:center;justify-content:center;}
 .prod-body{padding:8px 10px;}
 .prod-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
 .prod-price{font-size:12px;font-weight:800;color:var(--org);}
 
-/* ─── CHAT LIST ─── */
-.chat-item{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);}
-.chat-avatar{width:44px;height:44px;border-radius:14px;background:var(--gray-l);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:var(--org);flex-shrink:0;}
-.chat-info{flex:1;min-width:0;}
+/* CHAT */
+.chat-item{display:flex;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.chat-av{width:44px;height:44px;border-radius:13px;background:var(--gray-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--org);flex-shrink:0;}
 .chat-name{font-size:13px;font-weight:700;color:var(--text);}
-.chat-preview{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
-.chat-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;}
+.chat-prev{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
 .chat-time{font-size:10px;color:var(--text3);}
 .chat-unread{width:18px;height:18px;background:var(--org);border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;}
-
-/* ─── CHAT SCREEN ─── */
-.chat-header{display:flex;align-items:center;gap:10px;padding:6px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
-.chat-header .ch-av{width:36px;height:36px;border-radius:11px;background:var(--gray-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--org);}
-.chat-header .ch-name{font-size:14px;font-weight:700;color:var(--text);}
-.chat-header .ch-status{font-size:11px;color:var(--green);}
-.chat-messages{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:10px;}
-.chat-messages::-webkit-scrollbar{display:none;}
+.chat-hdr{display:flex;align-items:center;gap:10px;padding:4px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ch-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.ch-name{font-size:14px;font-weight:700;color:var(--text);}
+.ch-status{font-size:11px;color:var(--green);}
+.msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:9px;}
+.msgs::-webkit-scrollbar{display:none;}
 .msg{max-width:80%;}
 .msg-out{align-self:flex-end;}
 .msg-in{align-self:flex-start;}
-.msg-bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;}
-.msg-out .msg-bubble{background:var(--org);color:#fff;border-bottom-right-radius:4px;}
-.msg-in .msg-bubble{background:var(--gray-l);color:var(--text);border-bottom-left-radius:4px;}
+.bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;}
+.msg-out .bubble{background:var(--org);color:#fff;border-bottom-right-radius:4px;}
+.msg-in .bubble{background:var(--gray-l);color:var(--text);border-bottom-left-radius:4px;}
 .msg-time{font-size:10px;color:var(--text3);margin-top:3px;text-align:right;}
 .msg-in .msg-time{text-align:left;}
-.chat-input-bar{display:flex;align-items:center;gap:8px;padding:10px 14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
-.chat-input-bar input{flex:1;border:1.5px solid var(--border);border-radius:99px;padding:10px 14px;font-family:inherit;font-size:13px;background:#fff;outline:none;}
-.chat-input-bar input:focus{border-color:var(--org);}
+.chat-input{display:flex;align-items:center;gap:8px;padding:10px 14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+.chat-input input{flex:1;border:1.5px solid var(--border);border-radius:99px;padding:10px 14px;font-family:inherit;font-size:13px;background:#fff;outline:none;}
+.chat-input input:focus{border-color:var(--org);}
 .send-btn{width:38px;height:38px;border-radius:99px;background:var(--org);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 
-/* ─── USER PROFILE ─── */
-.user-profile-hero{background:var(--gray-l);padding:24px 18px;display:flex;flex-direction:column;align-items:center;border-radius:0 0 24px 24px;margin-bottom:6px;flex-shrink:0;}
-.user-av-lg{width:80px;height:80px;border-radius:99px;background:#fff;border:3px solid var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:900;color:var(--org);margin-bottom:10px;}
-.user-name-lg{font-size:18px;font-weight:800;color:var(--text);margin-bottom:3px;}
+/* USER PROFILE */
+.user-hero{background:var(--gray-l);padding:20px 18px;display:flex;flex-direction:column;align-items:center;border-radius:0 0 22px 22px;flex-shrink:0;}
+.user-av{width:76px;height:76px;border-radius:99px;background:#fff;border:3px solid var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:var(--org);margin-bottom:9px;}
+.user-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:2px;}
 .user-loc{font-size:12px;color:var(--text3);margin-bottom:10px;}
-.user-type-badge{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;}
+.user-type{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;}
 
-/* ─── SETTINGS ROWS ─── */
-.setting-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;}
-.setting-row:last-child{border-bottom:none;}
-.setting-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.setting-label{font-size:13px;font-weight:600;color:var(--text);flex:1;}
-.setting-value{font-size:12px;color:var(--text3);}
-.setting-arrow{color:var(--text3);}
+/* SETTING ROW */
+.srow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.srow:last-child{border-bottom:none;}
+.sicon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.slabel{font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.sval{font-size:12px;color:var(--text3);}
 
-/* ─── PREMIUM BANNER ─── */
-.premium-banner{background:linear-gradient(135deg,#F97316,#EA580C);border-radius:16px;padding:14px 16px;margin-bottom:16px;color:#fff;}
-.pb-title{font-size:14px;font-weight:800;margin-bottom:3px;}
-.pb-sub{font-size:11px;opacity:.85;margin-bottom:10px;}
-.pb-btn{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;}
+/* PREMIUM BANNER */
+.prem-banner{background:var(--org);border-radius:15px;padding:14px 16px;margin-bottom:16px;color:#fff;}
+.pb-t{font-size:14px;font-weight:800;margin-bottom:3px;}
+.pb-s{font-size:11px;opacity:.85;margin-bottom:10px;line-height:1.4;}
+.pb-btn{background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;}
 
-/* ─── SPLASH ─── */
-.splash-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:#fff;gap:8px;}
-.splash-logo{font-size:42px;font-weight:900;color:var(--org);letter-spacing:-1px;}
-.splash-tagline{font-size:13px;color:var(--text3);font-weight:500;}
-.splash-dot{width:8px;height:8px;border-radius:99px;background:var(--org);margin-top:32px;animation:pulse 1.2s ease-in-out infinite;}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
+/* STATS MINI */
+.mini-stats{display:flex;background:var(--gray-l);border-radius:13px;padding:12px;margin-bottom:14px;}
+.ms{flex:1;text-align:center;}
+.ms:not(:last-child){border-right:1px solid var(--border);}
+.ms .mn{font-size:16px;font-weight:800;color:var(--text);}
+.ms .ml{font-size:10px;color:var(--text3);margin-top:1px;}
 
-/* ─── AUTH SCREEN ─── */
-.auth-logo{font-size:32px;font-weight:900;color:var(--org);text-align:center;margin-bottom:4px;}
-.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:32px;}
-
-/* ─── DIVIDER TEXT ─── */
-.div-text{display:flex;align-items:center;gap:10px;margin:16px 0;}
-.div-text span{font-size:12px;color:var(--text3);white-space:nowrap;}
-.div-text::before,.div-text::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* ─── STAT MINI ─── */
-.mini-stats{display:flex;background:var(--gray-l);border-radius:14px;padding:12px;gap:0;margin-bottom:14px;}
-.mini-stat{flex:1;text-align:center;}
-.mini-stat:not(:last-child){border-right:1px solid var(--border);}
-.mini-stat .ms-n{font-size:16px;font-weight:800;color:var(--text);}
-.mini-stat .ms-l{font-size:10px;color:var(--text3);margin-top:1px;}
-
-/* ─── PIN DOTS (registration progress) ─── */
-.progress-dots{display:flex;gap:5px;justify-content:center;margin-bottom:20px;}
+/* PROGRESS */
+.prog-dots{display:flex;gap:5px;margin-bottom:18px;}
 .dot{width:7px;height:7px;border-radius:99px;background:var(--border);}
-.dot.on{background:var(--org);width:20px;}
+.dot.on{background:var(--org);width:22px;}
 
-/* SVG icon stroke helper */
-.ico{stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+/* SPLASH */
+.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:#fff;}
+.splash-logo{font-size:44px;font-weight:900;color:var(--org);letter-spacing:-1px;margin-bottom:6px;}
+.splash-tag{font-size:13px;color:var(--text3);font-weight:500;}
+.splash-dot{width:8px;height:8px;border-radius:99px;background:var(--org);margin-top:36px;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+
+/* AUTH */
+.auth-logo{font-size:34px;font-weight:900;color:var(--org);text-align:center;margin-bottom:4px;}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:28px;}
+.div-txt{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.div-txt span{font-size:12px;color:var(--text3);white-space:nowrap;}
+.div-txt::before,.div-txt::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PROV DASHBOARD */
+.prov-top-bar{background:var(--org);padding:0 18px;}
+.prov-header{background:var(--org);padding:10px 18px 18px;flex-shrink:0;}
+.prov-greeting{font-size:11px;color:rgba(255,255,255,.75);font-weight:600;}
+.prov-biz{font-size:18px;font-weight:800;color:#fff;margin-bottom:12px;}
+.prov-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.prov-stat{background:rgba(255,255,255,.2);border-radius:11px;padding:10px;text-align:center;}
+.prov-stat .n{font-size:18px;font-weight:800;color:#fff;}
+.prov-stat .l{font-size:9px;color:rgba(255,255,255,.8);}
+
+/* REQUEST CARD */
+.req-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:10px;}
+.req-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.req-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.req-name{font-size:13px;font-weight:700;color:var(--text);}
+.req-info{font-size:11px;color:var(--text3);}
+.req-msg{font-size:12px;color:var(--text2);background:var(--gray-l);border-radius:9px;padding:9px;margin-bottom:9px;line-height:1.5;}
+.req-btns{display:flex;gap:7px;}
+
+/* BAR CHART */
+.bar-item{margin-bottom:9px;}
+.bar-hdr{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.bar-bg{background:var(--gray-l);border-radius:99px;height:6px;}
+.bar-fg{height:6px;border-radius:99px;background:var(--org);}
+
+/* ICON HELPER */
+.ico{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
 </style>
 </head>
 <body>
 
-<div class="demo-wrapper">
-  <div class="demo-title">¡Ven Ya! — Prototipo interactivo · Todos los flujos</div>
+<!-- MODE SWITCHER -->
+<div style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;">¡Ven Ya! — Prototipo interactivo</div>
+<div class="mode-switch">
+  <button class="mode-btn active" id="btn-buyer" onclick="setMode('buyer')">Comprador</button>
+  <button class="mode-btn" id="btn-prov" onclick="setMode('prov')">Proveedor</button>
+</div>
 
-  <div class="phones-row">
+<div class="phone">
 
-    <!-- ══════════════════════════════════ -->
-    <!-- PHONE 1: FLUJO COMPLETO COMPRADOR -->
-    <!-- ══════════════════════════════════ -->
-    <div class="phone-col">
-      <div class="phone-label">Flujo de registro + Comprador</div>
-      <div class="phone" id="phone1">
+  <!-- ══════════════════════ -->
+  <!-- SPLASH                -->
+  <!-- ══════════════════════ -->
+  <div class="screen active" id="s-splash">
+    <div class="splash">
+      <div class="splash-logo">¡Ven Ya!</div>
+      <div class="splash-tag">Conecta con proveedores locales</div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
 
-        <!-- SPLASH -->
-        <div class="screen" id="p1-splash">
-          <div class="splash-screen">
-            <div class="splash-logo">¡Ven Ya!</div>
-            <div class="splash-tagline">Conecta con proveedores locales</div>
-            <div class="splash-dot"></div>
+  <!-- ══════════════════════ -->
+  <!-- AUTH                  -->
+  <!-- ══════════════════════ -->
+  <div class="screen" id="s-auth">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="scroll pad" style="padding-top:36px;">
+      <div class="auth-logo">¡Ven Ya!</div>
+      <div class="auth-sub">Conecta con proveedores locales</div>
+      <div class="ig">
+        <span class="lbl">Teléfono o correo</span>
+        <div class="inp-wrap">
+          <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="inp" placeholder="Ej. 2381234567">
+        </div>
+      </div>
+      <div class="ig">
+        <span class="lbl">Contraseña</span>
+        <div class="inp-wrap">
+          <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="inp" placeholder="••••••••" type="password">
+        </div>
+      </div>
+      <button class="btn btn-p" style="margin-bottom:10px;" onclick="loginAs()">Iniciar sesión</button>
+      <div class="div-txt"><span>o</span></div>
+      <button class="btn btn-o" onclick="go('s-auth','s-reg1')">Crear cuenta nueva</button>
+      <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:14px;">¿Olvidaste tu contraseña? <span style="color:var(--org);font-weight:700;cursor:pointer;">Recuperar</span></p>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ -->
+  <!-- REGISTRO 1            -->
+  <!-- ══════════════════════ -->
+  <div class="screen" id="s-reg1">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="go('s-reg1','s-auth')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+    </div>
+    <div class="scroll pad">
+      <div class="prog-dots"><div class="dot on"></div><div class="dot on"></div><div class="dot"></div></div>
+      <div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:4px;">Cuéntanos sobre ti</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Esta información nos ayuda a conectarte con proveedores de tu zona.</p>
+      <div class="ig">
+        <span class="lbl">Nombre completo o empresa</span>
+        <input class="inp" placeholder="Ej. María González" value="María González">
+      </div>
+      <div class="ig">
+        <span class="lbl">Estado</span>
+        <select class="inp">
+          <option>Puebla</option><option>CDMX</option><option>Jalisco</option><option>Michoacán</option><option>Veracruz</option><option>Oaxaca</option>
+        </select>
+      </div>
+      <div class="ig">
+        <span class="lbl">Municipio o región</span>
+        <input class="inp" placeholder="Ej. Tehuacán" value="Tehuacán">
+      </div>
+      <div style="margin-bottom:14px;">
+        <span class="lbl">Soy...</span>
+        <div class="role-grid">
+          <div class="role-card sel" id="rc-buyer" onclick="selRole('buyer')">
+            <div class="rc-icon">
+              <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <div class="rc-title">Comprador</div>
+            <div class="rc-sub">Busco productos</div>
+          </div>
+          <div class="role-card" id="rc-prov" onclick="selRole('prov')">
+            <div class="rc-icon">
+              <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div class="rc-title">Proveedor</div>
+            <div class="rc-sub">Vendo productos</div>
           </div>
         </div>
+      </div>
+      <button class="btn btn-p" onclick="go('s-reg1','s-reg2')">Continuar</button>
+    </div>
+  </div>
 
-        <!-- AUTH -->
-        <div class="screen hide" id="p1-auth">
-          <div class="status-bar">
-            <span class="time">9:41</span>
-            <div class="status-icons">
-              <svg class="ico" viewBox="0 0 24 24" width="14" height="14"><path d="M1 6l5.5 5.5L12 6l5.5 5.5L23 6M1 12l5.5 5.5L12 12l5.5 5.5L23 12"/></svg>
-              <svg class="ico" viewBox="0 0 24 24" width="12" height="12"><rect x="2" y="7" width="20" height="11" rx="2"/><path d="M22 11h1v4h-1"/></svg>
-            </div>
+  <!-- ══════════════════════ -->
+  <!-- REGISTRO 2 — PLAN     -->
+  <!-- ══════════════════════ -->
+  <div class="screen" id="s-reg2">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="go('s-reg2','s-reg1')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+    </div>
+    <div class="scroll pad">
+      <div class="prog-dots"><div class="dot on"></div><div class="dot on"></div><div class="dot on"></div></div>
+      <div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:4px;">Elige tu plan</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:22px;">Puedes cambiar esto cuando quieras.</p>
+      <div class="plan-grid">
+        <div class="plan-card sel" id="plan-free" onclick="selPlan('free')">
+          <div class="pc-name">Gratuito</div>
+          <div class="pc-price">$0 / mes</div>
+          <div class="pc-feat">Buscar proveedores<br>Ver perfiles<br>Chat básico<br>—<br>—</div>
+        </div>
+        <div class="plan-card" id="plan-pro" onclick="selPlan('pro')" style="border-color:var(--org);">
+          <div class="pc-tag">Recomendado</div>
+          <div class="pc-name">Premium</div>
+          <div class="pc-price">$79 / mes</div>
+          <div class="pc-feat">Todo lo gratuito<br>Top 5 estrellas<br>Filtros avanzados<br>Videollamadas<br>Sin anuncios</div>
+        </div>
+      </div>
+      <button class="btn btn-p" style="margin-bottom:10px;" onclick="loginAs()">Crear mi cuenta</button>
+      <button class="btn btn-g" onclick="loginAs()">Empezar gratis</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- HOME COMPRADOR                -->
+  <!-- ══════════════════════════════ -->
+  <div class="screen" id="s-buyer-home">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar">
+      <div>
+        <div style="font-size:11px;color:var(--text3);font-weight:600;">Buenos días</div>
+        <div class="topbar-title" style="font-size:17px;">María González</div>
+      </div>
+      <button style="width:36px;height:36px;border-radius:10px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="17" height="17"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </button>
+    </div>
+    <div class="scroll pad">
+      <div class="searchbar">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:var(--text3);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Buscar proveedores o productos...">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:var(--org);flex-shrink:0;"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+      </div>
+      <div class="chips">
+        <div class="chip on">Todos</div>
+        <div class="chip" onclick="toggleChip(this)">Ropa</div>
+        <div class="chip" onclick="toggleChip(this)">Agricultura</div>
+        <div class="chip" onclick="toggleChip(this)">Animales</div>
+        <div class="chip" onclick="toggleChip(this)">Servicios</div>
+        <div class="chip" onclick="toggleChip(this)">Electrónicos</div>
+      </div>
+      <div class="sh"><span class="st">Proveedores en Tehuacán</span><span class="sl">Ver todos</span></div>
+
+      <div class="pcard">
+        <div class="pav" style="background:#F0FDF4;color:#15803D;">RF</div>
+        <div class="pinfo">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div class="pname">Rancho El Fresno</div>
+            <svg class="ico" viewBox="0 0 24 24" width="12" height="12" style="color:var(--green);flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
-          <div class="scroll pad" style="justify-content:center;display:flex;flex-direction:column;padding-top:40px;">
-            <div class="auth-logo">¡Ven Ya!</div>
-            <div class="auth-sub">Conecta con proveedores locales</div>
-            <div class="input-group">
-              <span class="lbl">Teléfono o correo</span>
-              <div class="inp-icon">
-                <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                <input class="inp" placeholder="Ej. 2381234567" type="text">
-              </div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Michoacán · 42 km</div>
+          <div class="pcat">Agricultura</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <div class="input-group">
-              <span class="lbl">Contraseña</span>
-              <div class="inp-icon">
-                <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                <input class="inp" placeholder="••••••••" type="password">
-              </div>
-            </div>
-            <button class="btn btn-primary" style="margin-bottom:10px;" onclick="go('p1-auth','p1-home-buyer')">Iniciar sesión</button>
-            <div class="div-text"><span>o</span></div>
-            <button class="btn btn-outline" onclick="go('p1-auth','p1-reg1')">Crear cuenta nueva</button>
-            <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:16px;">¿Olvidaste tu contraseña? <span style="color:var(--org);font-weight:700;cursor:pointer;">Recuperar</span></p>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.9</span>
+            <span style="font-size:11px;color:var(--text3);">(128)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;" onclick="go('s-buyer-home','s-prov-profile')">Ver perfil</button>
           </div>
         </div>
+      </div>
 
-        <!-- REGISTRO PASO 1 -->
-        <div class="screen hide" id="p1-reg1">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar">
-            <button class="back-btn" onclick="go('p1-reg1','p1-auth')">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Volver
-            </button>
-          </div>
-          <div class="scroll pad">
-            <div class="progress-dots" style="justify-content:flex-start;margin-bottom:18px;">
-              <div class="dot on"></div><div class="dot on"></div><div class="dot"></div>
+      <div class="pcard">
+        <div class="pav">PM</div>
+        <div class="pinfo">
+          <div class="pname">Paca Mayoreo MX</div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Puebla · 8 km</div>
+          <div class="pcat">Ropa</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#E5E7EB"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <div class="t-h2" style="margin-bottom:4px;">Cuéntanos sobre ti</div>
-            <p class="t-body" style="margin-bottom:20px;">Esta información nos ayuda a conectarte con proveedores de tu zona.</p>
-            <div class="input-group">
-              <span class="lbl">Nombre completo o empresa</span>
-              <input class="inp" placeholder="Ej. María González" value="María González">
-            </div>
-            <div class="input-group">
-              <span class="lbl">Estado</span>
-              <select class="inp">
-                <option>Puebla</option><option>CDMX</option><option>Jalisco</option><option>Michoacán</option><option>Veracruz</option><option>Oaxaca</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <span class="lbl">Municipio o región</span>
-              <input class="inp" placeholder="Ej. Tehuacán" value="Tehuacán">
-            </div>
-            <div style="margin-bottom:14px;">
-              <span class="lbl">Soy...</span>
-              <div class="role-grid">
-                <div class="role-card" id="role-buyer" onclick="selectRole('buyer')">
-                  <div class="rc-icon">
-                    <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                  </div>
-                  <div class="rc-title">Comprador</div>
-                  <div class="rc-sub">Busco productos</div>
-                </div>
-                <div class="role-card" id="role-prov" onclick="selectRole('prov')">
-                  <div class="rc-icon">
-                    <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-                  </div>
-                  <div class="rc-title">Proveedor</div>
-                  <div class="rc-sub">Vendo productos</div>
-                </div>
-              </div>
-            </div>
-            <button class="btn btn-primary" onclick="go('p1-reg1','p1-reg2')">Continuar</button>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.2</span>
+            <span style="font-size:11px;color:var(--text3);">(64)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
           </div>
         </div>
+      </div>
 
-        <!-- REGISTRO PASO 2 - PLAN -->
-        <div class="screen hide" id="p1-reg2">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar">
-            <button class="back-btn" onclick="go('p1-reg2','p1-reg1')">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Volver
-            </button>
-          </div>
-          <div class="scroll pad">
-            <div class="progress-dots" style="justify-content:flex-start;margin-bottom:18px;">
-              <div class="dot on"></div><div class="dot on"></div><div class="dot on"></div>
+      <div class="pcard">
+        <div class="pav" style="background:#F0F9FF;color:#0369A1;">TM</div>
+        <div class="pinfo">
+          <div class="pname">TechMayoreo</div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Guadalajara · 180 km</div>
+          <div class="pcat" style="background:#EFF6FF;color:#1D4ED8;">Electrónicos</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             </div>
-            <div class="t-h2" style="margin-bottom:4px;">Elige tu plan</div>
-            <p class="t-body" style="margin-bottom:20px;">Puedes cambiar esto en cualquier momento.</p>
-            <div class="plan-grid">
-              <div class="plan-card selected" id="plan-free" onclick="selectPlan('free')">
-                <div class="pc-name">Gratuito</div>
-                <div class="pc-price">$0 / mes</div>
-                <div class="pc-feat">Buscar proveedores<br>Ver perfiles<br>Chat básico<br>—<br>—</div>
-              </div>
-              <div class="plan-card" id="plan-pro" onclick="selectPlan('pro')" style="border-color:var(--org);">
-                <div class="pc-tag">Recomendado</div>
-                <div class="pc-name">Premium</div>
-                <div class="pc-price">$79 / mes</div>
-                <div class="pc-feat">Todo lo gratuito<br>Top 5 estrellas<br>Filtros avanzados<br>Videollamadas<br>Sin anuncios</div>
-              </div>
-            </div>
-            <button class="btn btn-primary" style="margin-bottom:10px;" onclick="go('p1-reg2','p1-home-buyer')">Crear mi cuenta</button>
-            <button class="btn btn-gray" onclick="go('p1-reg2','p1-home-buyer')">Empezar gratis</button>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.8</span>
+            <span style="font-size:11px;color:var(--text3);">(203)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
           </div>
         </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn active" id="b-buyer-home">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" id="b-buyer-chat" onclick="buyerNav('s-buyer-chat','b-buyer-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" id="b-buyer-profile" onclick="buyerNav('s-buyer-myprofile','b-buyer-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
 
-        <!-- HOME COMPRADOR -->
-        <div class="screen hide" id="p1-home-buyer">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar">
+  <!-- ══════════════════════════════ -->
+  <!-- PERFIL DEL PROVEEDOR          -->
+  <!-- ══════════════════════════════ -->
+  <div class="screen" id="s-prov-profile">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar" style="padding-bottom:6px;">
+      <button class="back-btn" onclick="go('s-prov-profile','s-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <button style="width:34px;height:34px;border-radius:10px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <div class="prof-hero">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div class="av-lg" style="background:#F0FDF4;color:#15803D;">RF</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+              <div class="pname-lg">Rancho El Fresno</div>
+              <span class="badge bg"><svg class="ico" viewBox="0 0 24 24" width="9" height="9"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Verificado</span>
+            </div>
+            <div class="ploc-lg"><svg class="ico" viewBox="0 0 24 24" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Uruapan, Michoacán</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span class="badge bo">Agricultura</span>
+              <span class="badge bo">Mayoreo</span>
+            </div>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div class="pstats">
+          <div class="pstat"><div class="n">4.9</div><div class="l">Calificación</div></div>
+          <div class="pstat"><div class="n">128</div><div class="l">Reseñas</div></div>
+          <div class="pstat"><div class="n">3 años</div><div class="l">Activo</div></div>
+          <div class="pstat"><div class="n">98%</div><div class="l">Responde</div></div>
+        </div>
+      </div>
+      <div class="pad">
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:14px;">Productores de aguacate Hass, fresa y uva de la Meseta Purépecha. Envíos a toda la república. Precio justo, calidad garantizada.</p>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button class="btn btn-p" style="flex:1;" onclick="go('s-prov-profile','s-buyer-chatconv')">
+            <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#fff"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Enviar mensaje
+          </button>
+          <button class="btn btn-g" style="width:46px;padding:0;flex-shrink:0;">
+            <svg class="ico" viewBox="0 0 24 24" width="17" height="17"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="btn btn-green" style="width:46px;padding:0;flex-shrink:0;">
+            <svg class="ico" viewBox="0 0 24 24" width="17" height="17" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </button>
+        </div>
+        <div class="sh"><span class="st">Productos</span></div>
+        <div class="prod-grid">
+          <div class="prod-card"><div class="prod-img" style="background:#DCFCE7;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#15803D"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg></div><div class="prod-body"><div class="prod-name">Aguacate Hass</div><div class="prod-price">$28 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#FFE4E6;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#BE123C"><circle cx="12" cy="12" r="6"/></svg></div><div class="prod-body"><div class="prod-name">Fresa fresca</div><div class="prod-price">$35 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#F5F3FF;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#7C3AED"><circle cx="12" cy="12" r="5"/></svg></div><div class="prod-body"><div class="prod-name">Uva Red Globe</div><div class="prod-price">$45 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#FFF7ED;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:var(--org)"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg></div><div class="prod-body"><div class="prod-name">Mango Ataulfo</div><div class="prod-price">$22 / kg</div></div></div>
+        </div>
+        <div class="sh"><span class="st">Reseñas</span><span class="sl">Ver todas (128)</span></div>
+        <div class="rev">
+          <div class="rev-top">
+            <div class="rev-av">AL</div>
             <div>
-              <div style="font-size:11px;color:var(--text3);font-weight:600;">Buenos días</div>
-              <div class="title" style="font-size:17px;">María González</div>
+              <div class="rev-name">Ana López</div>
+              <div class="stars" style="display:flex;gap:1px;margin-top:2px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
             </div>
-            <button class="icon-btn">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-            </button>
+            <div class="rev-date">Hace 3 días</div>
           </div>
-          <div class="scroll pad">
-            <div class="searchbar">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="var(--text3)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input placeholder="Buscar proveedores o productos...">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="var(--org)"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
-            </div>
-            <div class="chips-row">
-              <div class="chip on">Todos</div>
-              <div class="chip">Ropa</div>
-              <div class="chip">Agricultura</div>
-              <div class="chip">Animales</div>
-              <div class="chip">Servicios</div>
-              <div class="chip">Electrónicos</div>
-            </div>
-            <div class="sec-hdr">
-              <span class="s-title">Proveedores en Tehuacán</span>
-              <span class="s-link">Ver todos</span>
-            </div>
-            <!-- Card 1 -->
-            <div class="prov-card">
-              <div class="prov-avatar" style="background:#F0FDF4;">
-                <span class="initials" style="color:#15803D;">RF</span>
-              </div>
-              <div class="prov-info">
-                <div style="display:flex;align-items:center;gap:5px;">
-                  <div class="prov-name">Rancho El Fresno</div>
-                  <svg class="ico" viewBox="0 0 24 24" width="13" height="13" color="var(--green)"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                </div>
-                <div class="prov-loc">
-                  <svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Michoacán · 42 km
-                </div>
-                <div class="prov-cat">Agricultura</div>
-                <div class="stars-row">
-                  <div class="stars">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
-                  <span class="rating-num">4.9</span><span class="rating-count">(128)</span>
-                </div>
-                <div class="prov-card-footer">
-                  <button class="btn btn-primary btn-xs" onclick="go('p1-home-buyer','p1-prov-profile')">Ver perfil</button>
-                </div>
-              </div>
-            </div>
-            <!-- Card 2 -->
-            <div class="prov-card">
-              <div class="prov-avatar" style="background:#FFF4EE;">
-                <span class="initials">PM</span>
-              </div>
-              <div class="prov-info">
-                <div class="prov-name">Paca Mayoreo MX</div>
-                <div class="prov-loc">
-                  <svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Puebla · 8 km
-                </div>
-                <div class="prov-cat">Ropa</div>
-                <div class="stars-row">
-                  <div class="stars">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#E5E7EB"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
-                  <span class="rating-num">4.2</span><span class="rating-count">(64)</span>
-                </div>
-                <div class="prov-card-footer">
-                  <button class="btn btn-primary btn-xs" onclick="go('p1-home-buyer','p1-prov-profile')">Ver perfil</button>
-                </div>
-              </div>
-            </div>
-            <!-- Card 3 -->
-            <div class="prov-card">
-              <div class="prov-avatar" style="background:#F0F9FF;">
-                <span class="initials" style="color:#0369A1;">TM</span>
-              </div>
-              <div class="prov-info">
-                <div class="prov-name">TechMayoreo</div>
-                <div class="prov-loc">
-                  <svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                  Guadalajara · 180 km
-                </div>
-                <div class="prov-cat" style="background:#EFF6FF;color:#1D4ED8;">Electrónicos</div>
-                <div class="stars-row">
-                  <div class="stars">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                  </div>
-                  <span class="rating-num">4.8</span><span class="rating-count">(203)</span>
-                </div>
-                <div class="prov-card-footer">
-                  <button class="btn btn-primary btn-xs">Ver perfil</button>
-                </div>
-              </div>
-            </div>
-            <div style="height:16px;"></div>
-          </div>
-          <div class="bnav">
-            <button class="bn active" onclick="navBuyer(this,'p1-home-buyer')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22" color="var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Inicio</span>
-            </button>
-            <button class="bn" onclick="navBuyer(this,'p1-chat-list')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Chat</span>
-            </button>
-            <button class="bn" onclick="navBuyer(this,'p1-user-profile')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Perfil</span>
-            </button>
-          </div>
+          <div class="rev-txt">Excelente calidad, llegó en perfectas condiciones. Muy buen trato y precio justo para mayoreo.</div>
         </div>
-
-        <!-- PERFIL PROVEEDOR (visto desde comprador) -->
-        <div class="screen hide slide-left" id="p1-prov-profile">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar" style="padding-bottom:8px;">
-            <button class="back-btn" onclick="go('p1-prov-profile','p1-home-buyer')">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Volver
-            </button>
-            <button class="icon-btn">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-            </button>
-          </div>
-          <div class="scroll">
-            <div class="profile-hero">
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div class="prof-avatar-lg" style="background:#F0FDF4;color:#15803D;">RF</div>
-                <div style="flex:1;">
-                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
-                    <div class="prof-name-lg">Rancho El Fresno</div>
-                    <span class="badge badge-green">
-                      <svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                      Verificado
-                    </span>
-                  </div>
-                  <div class="prof-loc">
-                    <svg class="ico" viewBox="0 0 24 24" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    Uruapan, Michoacán
-                  </div>
-                  <div style="display:flex;gap:5px;flex-wrap:wrap;">
-                    <span class="badge badge-orange">Agricultura</span>
-                    <span class="badge badge-orange">Mayoreo</span>
-                  </div>
-                </div>
-              </div>
-              <div class="divider" style="margin:12px 0;"></div>
-              <div class="prof-stats">
-                <div class="prof-stat"><div class="n">4.9</div><div class="l">Calificación</div></div>
-                <div class="prof-stat"><div class="n">128</div><div class="l">Reseñas</div></div>
-                <div class="prof-stat"><div class="n">3 años</div><div class="l">Activo</div></div>
-                <div class="prof-stat"><div class="n">98%</div><div class="l">Responde</div></div>
+        <div class="rev">
+          <div class="rev-top">
+            <div class="rev-av" style="background:#EFF6FF;color:#1D4ED8;">RC</div>
+            <div>
+              <div class="rev-name">Roberto C.</div>
+              <div class="stars" style="display:flex;gap:1px;margin-top:2px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
               </div>
             </div>
-            <div class="pad">
-              <p class="t-body" style="margin-bottom:16px;">Productores de aguacate Hass, fresa y uva de la Meseta Purépecha. Envíos a toda la república. Precio justo, calidad garantizada.</p>
-              <div style="display:flex;gap:8px;margin-bottom:16px;">
-                <button class="btn btn-primary" style="flex:1;" onclick="go('p1-prov-profile','p1-chat-conv')">
-                  <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="#fff"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                  Enviar mensaje
-                </button>
-                <button class="btn btn-gray" style="width:48px;padding:0;flex-shrink:0;">
-                  <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                </button>
-                <button class="btn btn-gray" style="width:48px;padding:0;flex-shrink:0;background:var(--green-l);">
-                  <svg class="ico" viewBox="0 0 24 24" width="18" height="18" color="var(--green)"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-                </button>
-              </div>
-              <div class="sec-hdr"><span class="s-title">Productos</span></div>
-              <div class="prod-grid">
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#DCFCE7;">
-                    <svg class="ico" viewBox="0 0 24 24" width="32" height="32" color="#15803D"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Aguacate Hass</div><div class="prod-price">$28 / kg</div></div>
-                </div>
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#FFE4E6;">
-                    <svg class="ico" viewBox="0 0 24 24" width="32" height="32" color="#BE123C"><circle cx="12" cy="12" r="5"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Fresa fresca</div><div class="prod-price">$35 / kg</div></div>
-                </div>
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#F5F3FF;">
-                    <svg class="ico" viewBox="0 0 24 24" width="32" height="32" color="#7C3AED"><circle cx="12" cy="12" r="4"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Uva Red Globe</div><div class="prod-price">$45 / kg</div></div>
-                </div>
-                <div class="prod-card" style="background:var(--gray-l);border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:center;min-height:100px;">
-                  <div style="text-align:center;">
-                    <svg class="ico" viewBox="0 0 24 24" width="20" height="20" color="var(--text3)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                    <div style="font-size:10px;color:var(--text3);margin-top:3px;">Ver más</div>
-                  </div>
-                </div>
-              </div>
-              <div class="sec-hdr"><span class="s-title">Reseñas recientes</span><span class="s-link">Ver todas</span></div>
-              <div class="review">
-                <div class="review-top">
-                  <div class="review-avatar">AL</div>
-                  <div>
-                    <div class="review-name">Ana López</div>
-                    <div class="stars" style="margin-top:2px;">
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    </div>
-                  </div>
-                  <div class="review-date">Hace 3 días</div>
-                </div>
-                <div class="review-text">Excelente calidad, llegó en perfectas condiciones. El trato fue muy amable y el precio es justo para mayoreo.</div>
-              </div>
-              <div class="review">
-                <div class="review-top">
-                  <div class="review-avatar" style="background:#EFF6FF;color:#1D4ED8;">RC</div>
-                  <div>
-                    <div class="review-name">Roberto C.</div>
-                    <div class="stars" style="margin-top:2px;">
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    </div>
-                  </div>
-                  <div class="review-date">Hace 1 sem</div>
-                </div>
-                <div class="review-text">Ya es la cuarta vez que compro con ellos. Siempre cumplen. 100% recomendado para mayoreo.</div>
-              </div>
-              <div style="height:16px;"></div>
-            </div>
+            <div class="rev-date">Hace 1 sem</div>
           </div>
+          <div class="rev-txt">Cuarta vez que compro. Siempre cumple con la calidad. 100% recomendado.</div>
         </div>
+        <div style="height:16px;"></div>
+      </div>
+    </div>
+  </div>
 
-        <!-- CHAT LIST -->
-        <div class="screen hide" id="p1-chat-list">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar"><div class="title">Mensajes</div></div>
-          <div class="scroll pad">
-            <div class="searchbar" style="margin-bottom:14px;">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="var(--text3)"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-              <input placeholder="Buscar en mensajes...">
-            </div>
-            <div class="chat-item" style="cursor:pointer;" onclick="go('p1-chat-list','p1-chat-conv')">
-              <div class="chat-avatar" style="background:#F0FDF4;color:#15803D;">RF</div>
-              <div class="chat-info">
-                <div class="chat-name">Rancho El Fresno</div>
-                <div class="chat-preview">¿Para cuándo necesita el pedido?</div>
-              </div>
-              <div class="chat-meta">
-                <div class="chat-time">10:24</div>
-                <div class="chat-unread">2</div>
-              </div>
-            </div>
-            <div class="chat-item">
-              <div class="chat-avatar">PM</div>
-              <div class="chat-info">
-                <div class="chat-name">Paca Mayoreo MX</div>
-                <div class="chat-preview">Tú: Cuánto por 200 piezas?</div>
-              </div>
-              <div class="chat-meta">
-                <div class="chat-time">Ayer</div>
-              </div>
-            </div>
-            <div class="chat-item">
-              <div class="chat-avatar" style="background:#F0F9FF;color:#0369A1;">TM</div>
-              <div class="chat-info">
-                <div class="chat-name">TechMayoreo</div>
-                <div class="chat-preview">Los cargadores están disponibles</div>
-              </div>
-              <div class="chat-meta">
-                <div class="chat-time">Lun</div>
-              </div>
-            </div>
-          </div>
-          <div class="bnav">
-            <button class="bn" onclick="navBuyer(this,'p1-home-buyer')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Inicio</span>
-            </button>
-            <button class="bn active" onclick="navBuyer(this,'p1-chat-list')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22" color="var(--org)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Chat</span>
-            </button>
-            <button class="bn" onclick="navBuyer(this,'p1-user-profile')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Perfil</span>
-            </button>
-          </div>
+  <!-- CHAT LIST COMPRADOR -->
+  <div class="screen" id="s-buyer-chat">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar"><div class="topbar-title">Mensajes</div></div>
+    <div class="scroll pad">
+      <div class="searchbar" style="margin-bottom:14px;">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:var(--text3);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Buscar en mensajes...">
+      </div>
+      <div class="chat-item" onclick="go('s-buyer-chat','s-buyer-chatconv')">
+        <div class="chat-av" style="background:#F0FDF4;color:#15803D;">RF</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">Rancho El Fresno</div>
+          <div class="chat-prev">Para cuándo necesita el pedido?</div>
         </div>
-
-        <!-- CHAT CONVERSACIÓN -->
-        <div class="screen hide slide-left" id="p1-chat-conv">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="chat-header">
-            <button class="back-btn" onclick="go('p1-chat-conv','p1-chat-list')" style="margin-right:4px;">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-            </button>
-            <div class="ch-av" style="background:#F0FDF4;color:#15803D;">RF</div>
-            <div style="flex:1;">
-              <div class="ch-name">Rancho El Fresno</div>
-              <div class="ch-status">En línea</div>
-            </div>
-            <button class="icon-btn">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            </button>
-          </div>
-          <div class="chat-messages">
-            <div class="msg msg-in">
-              <div class="msg-bubble">Hola, vi su perfil. ¿Tiene aguacate disponible esta semana?</div>
-              <div class="msg-time">9:15</div>
-            </div>
-            <div class="msg msg-out">
-              <div class="msg-bubble">Sí, tenemos stock. ¿Cuántos kilos necesita?</div>
-              <div class="msg-time">9:17</div>
-            </div>
-            <div class="msg msg-in">
-              <div class="msg-bubble">Necesito 200 kg de Hass. ¿Cuál es el precio por mayoreo?</div>
-              <div class="msg-time">9:18</div>
-            </div>
-            <div class="msg msg-out">
-              <div class="msg-bubble">$28 por kilo, con envío incluido a partir de 100 kg. Total: $5,600 MXN. ¿Le parece bien?</div>
-              <div class="msg-time">9:20</div>
-            </div>
-            <div class="msg msg-in">
-              <div class="msg-bubble">Perfecto. ¿Para cuándo puede ser la entrega?</div>
-              <div class="msg-time">9:22</div>
-            </div>
-          </div>
-          <div class="chat-input-bar">
-            <button class="icon-btn" style="width:34px;height:34px;flex-shrink:0;">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </button>
-            <input placeholder="Escribe un mensaje...">
-            <button class="send-btn">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-          </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="chat-time">10:24</div>
+          <div class="chat-unread">2</div>
         </div>
-
-        <!-- PERFIL USUARIO (COMPRADOR) -->
-        <div class="screen hide" id="p1-user-profile">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="user-profile-hero">
-            <div class="user-av-lg">MG</div>
-            <div class="user-name-lg">María González</div>
-            <div class="user-loc">Tehuacán, Puebla</div>
-            <span class="user-type-badge" style="background:var(--org-l);color:var(--org2);">Comprador · Plan Gratuito</span>
-          </div>
-          <div class="scroll pad">
-            <div class="premium-banner">
-              <div class="pb-title">Mejora a Premium</div>
-              <div class="pb-sub">Accede a proveedores con 5 estrellas, filtros avanzados y videollamadas.</div>
-              <button class="pb-btn">Ver beneficios</button>
-            </div>
-            <div class="mini-stats" style="margin-bottom:16px;">
-              <div class="mini-stat"><div class="ms-n">12</div><div class="ms-l">Búsquedas</div></div>
-              <div class="mini-stat"><div class="ms-n">3</div><div class="ms-l">Chats</div></div>
-              <div class="mini-stat"><div class="ms-n">5</div><div class="ms-l">Guardados</div></div>
-            </div>
-            <div class="sec-hdr"><span class="s-title">Configuración</span></div>
-            <div class="setting-row">
-              <div class="setting-icon" style="background:var(--org-l);">
-                <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <span class="setting-label">Editar perfil</span>
-              <svg class="ico setting-arrow" viewBox="0 0 24 24" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div class="setting-row">
-              <div class="setting-icon" style="background:#EFF6FF;">
-                <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="#1D4ED8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              </div>
-              <span class="setting-label">Ubicación</span>
-              <span class="setting-value">Tehuacán, Pue.</span>
-              <svg class="ico setting-arrow" viewBox="0 0 24 24" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div class="setting-row">
-              <div class="setting-icon" style="background:var(--gray-l);">
-                <svg class="ico" viewBox="0 0 24 24" width="16" height="16"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-              </div>
-              <span class="setting-label">Notificaciones</span>
-              <svg class="ico setting-arrow" viewBox="0 0 24 24" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div class="setting-row">
-              <div class="setting-icon" style="background:#FEF3C7;">
-                <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="#B45309"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              </div>
-              <span class="setting-label">Mis guardados</span>
-              <svg class="ico setting-arrow" viewBox="0 0 24 24" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div class="setting-row">
-              <div class="setting-icon" style="background:#FFF1F2;">
-                <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="#E11D48"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-              </div>
-              <span class="setting-label">Cerrar sesión</span>
-              <svg class="ico setting-arrow" viewBox="0 0 24 24" width="14" height="14"><polyline points="9 18 15 12 9 6"/></svg>
-            </div>
-            <div style="height:16px;"></div>
-          </div>
-          <div class="bnav">
-            <button class="bn" onclick="navBuyer(this,'p1-home-buyer')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Inicio</span>
-            </button>
-            <button class="bn" onclick="navBuyer(this,'p1-chat-list')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Chat</span>
-            </button>
-            <button class="bn active" onclick="navBuyer(this,'p1-user-profile')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22" color="var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Perfil</span>
-            </button>
-          </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-av">PM</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">Paca Mayoreo MX</div>
+          <div class="chat-prev">Tú: Cuánto por 200 piezas?</div>
         </div>
+        <div class="chat-time">Ayer</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-av" style="background:#F0F9FF;color:#0369A1;">TM</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">TechMayoreo</div>
+          <div class="chat-prev">Los cargadores están disponibles</div>
+        </div>
+        <div class="chat-time">Lun</div>
+      </div>
+    </div>
+    <div class="bnav">
+      <button class="bn" onclick="buyerNav('s-buyer-home','b-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn active" id="b-buyer-chat">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" onclick="buyerNav('s-buyer-myprofile','b-buyer-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
 
-      </div><!-- /phone1 -->
+  <!-- CHAT CONVERSACIÓN COMPRADOR -->
+  <div class="screen" id="s-buyer-chatconv">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="chat-hdr">
+      <button class="back-btn" onclick="go('s-buyer-chatconv','s-buyer-chat')" style="margin-right:2px;">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="ch-av" style="background:#F0FDF4;color:#15803D;">RF</div>
+      <div style="flex:1;">
+        <div class="ch-name">Rancho El Fresno</div>
+        <div class="ch-status">En línea</div>
+      </div>
+      <button style="width:32px;height:32px;border-radius:9px;background:var(--green-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </button>
+    </div>
+    <div class="msgs">
+      <div class="msg msg-in"><div class="bubble">Hola, ¿tiene aguacate disponible esta semana?</div><div class="msg-time">9:15</div></div>
+      <div class="msg msg-out"><div class="bubble">Sí, tenemos. ¿Cuántos kilos necesita?</div><div class="msg-time">9:17</div></div>
+      <div class="msg msg-in"><div class="bubble">200 kg para surtir mi negocio.</div><div class="msg-time">9:18</div></div>
+      <div class="msg msg-out"><div class="bubble">$28/kg, envío incluido. Total: $5,600 MXN. Entrega en 2-3 días.</div><div class="msg-time">9:20</div></div>
+      <div class="msg msg-in"><div class="bubble">Perfecto. ¿Para cuándo puede ser?</div><div class="msg-time">9:22</div></div>
+    </div>
+    <div class="chat-input">
+      <button style="width:32px;height:32px;border-radius:8px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <input placeholder="Escribe un mensaje...">
+      <button class="send-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
 
-      <!-- nav hint -->
-      <div style="font-size:11px;color:#aaa;text-align:center;max-width:280px;line-height:1.5;">
-        Toca <span style="color:var(--org);font-weight:700;">"Iniciar sesión"</span> para saltar al home,<br>o <span style="color:var(--org);font-weight:700;">"Crear cuenta"</span> para el flujo completo
+  <!-- PERFIL USUARIO COMPRADOR -->
+  <div class="screen" id="s-buyer-myprofile">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="user-hero">
+      <div class="user-av">MG</div>
+      <div class="user-name">María González</div>
+      <div class="user-loc">Tehuacán, Puebla</div>
+      <span class="user-type" style="background:var(--org-l);color:var(--org2);">Comprador · Plan Gratuito</span>
+    </div>
+    <div class="scroll pad" style="padding-top:14px;">
+      <div class="prem-banner">
+        <div class="pb-t">Mejora a Premium</div>
+        <div class="pb-s">Accede a proveedores con 5 estrellas, filtros avanzados y videollamadas.</div>
+        <button class="pb-btn">Ver beneficios</button>
+      </div>
+      <div class="mini-stats">
+        <div class="ms"><div class="mn">12</div><div class="ml">Búsquedas</div></div>
+        <div class="ms"><div class="mn">3</div><div class="ml">Chats</div></div>
+        <div class="ms"><div class="mn">5</div><div class="ml">Guardados</div></div>
+      </div>
+      <div class="sh"><span class="st">Configuración</span></div>
+      <div class="srow"><div class="sicon" style="background:var(--org-l);"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="slabel">Editar perfil</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:#EFF6FF;"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#1D4ED8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="slabel">Ubicación</span><span class="sval">Tehuacán, Pue.</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:var(--gray-l);"><svg class="ico" viewBox="0 0 24 24" width="15" height="15"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Notificaciones</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:#FFF1F2;"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#E11D48"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div><span class="slabel">Cerrar sesión</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn" onclick="buyerNav('s-buyer-home','b-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" onclick="buyerNav('s-buyer-chat','b-buyer-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn active" id="b-buyer-profile">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PROVEEDOR — HOME / DASHBOARD      -->
+  <!-- ══════════════════════════════════ -->
+  <div class="screen" id="s-prov-home">
+    <div class="prov-top-bar">
+      <div class="sb white"><span class="time">9:41</span></div>
+    </div>
+    <div class="prov-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div class="prov-greeting">Bienvenido</div>
+          <div class="prov-biz">Rancho El Fresno</div>
+        </div>
+        <div style="background:rgba(255,255,255,.2);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;">RF</div>
+      </div>
+      <div class="prov-stats-grid">
+        <div class="prov-stat"><div class="n">342</div><div class="l">Visitas</div></div>
+        <div class="prov-stat"><div class="n">47</div><div class="l">Contactos</div></div>
+        <div class="prov-stat"><div class="n">4.9</div><div class="l">Rating</div></div>
+      </div>
+    </div>
+    <div class="scroll pad" style="padding-top:14px;">
+      <div class="sh"><span class="st">Solicitudes nuevas</span><span class="sl">Ver todas</span></div>
+      <div class="req-card">
+        <div class="req-top">
+          <div class="req-av" style="background:var(--org-l);color:var(--org2);">MG</div>
+          <div style="flex:1;">
+            <div class="req-name">María González</div>
+            <div class="req-info">Tehuacán, Puebla · Hace 15 min</div>
+          </div>
+          <span class="badge bo">Nueva</span>
+        </div>
+        <div class="req-msg">Necesito 200 kg de aguacate Hass. ¿Tienen para esta semana?</div>
+        <div class="req-btns">
+          <button class="btn btn-p btn-sm" style="flex:1;" onclick="go('s-prov-home','s-prov-chat')">Responder</button>
+          <button class="btn btn-g btn-sm">Ver perfil</button>
+        </div>
+      </div>
+      <div class="req-card">
+        <div class="req-top">
+          <div class="req-av" style="background:#EFF6FF;color:#1D4ED8;">CM</div>
+          <div style="flex:1;">
+            <div class="req-name">Carlos Mendoza</div>
+            <div class="req-info">CDMX · Hace 2 horas</div>
+          </div>
+          <span class="badge bgr">Pendiente</span>
+        </div>
+        <div class="req-msg">¿Precio por 500 kg? Soy distribuidor, compro mensual.</div>
+        <div class="req-btns">
+          <button class="btn btn-p btn-sm" style="flex:1;">Responder</button>
+          <button class="btn btn-g btn-sm">Ver perfil</button>
+        </div>
+      </div>
+      <div class="sh" style="margin-top:4px;"><span class="st">Rendimiento del mes</span></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:14px;">
+        <div class="bar-item"><div class="bar-hdr"><span>Aguacate Hass</span><span style="font-weight:700;">168 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:82%;"></div></div></div>
+        <div class="bar-item"><div class="bar-hdr"><span>Fresa fresca</span><span style="font-weight:700;">96 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:47%;background:var(--gray-d);"></div></div></div>
+        <div class="bar-item"><div class="bar-hdr"><span>Uva Red Globe</span><span style="font-weight:700;">78 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:38%;background:var(--gray-d);"></div></div></div>
+      </div>
+      <div style="height:10px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn active" id="b-prov-home">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" id="b-prov-chat" onclick="provNav('s-prov-chat','b-prov-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" id="b-prov-profile" onclick="provNav('s-prov-myprofile','b-prov-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT PROVEEDOR -->
+  <div class="screen" id="s-prov-chat">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="chat-hdr">
+      <button class="back-btn" onclick="go('s-prov-chat','s-prov-home')" style="margin-right:2px;">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="ch-av" style="background:var(--org-l);color:var(--org2);">MG</div>
+      <div style="flex:1;">
+        <div class="ch-name">María González</div>
+        <div class="ch-status">Comprador · Tehuacán</div>
+      </div>
+      <button style="width:32px;height:32px;border-radius:9px;background:var(--green-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </button>
+    </div>
+    <div class="msgs">
+      <div class="msg msg-in"><div class="bubble">Hola, ¿tienen aguacate disponible esta semana?</div><div class="msg-time">9:15</div></div>
+      <div class="msg msg-out"><div class="bubble">Sí, tenemos. ¿Cuántos kilos necesita?</div><div class="msg-time">9:17</div></div>
+      <div class="msg msg-in"><div class="bubble">200 kg para surtir mi negocio.</div><div class="msg-time">9:18</div></div>
+      <div class="msg msg-out"><div class="bubble">$28/kg con envío incluido. Total: $5,600 MXN. Entrega en 2-3 días a Tehuacán.</div><div class="msg-time">9:20</div></div>
+      <div style="background:var(--gray-l);border-radius:13px;padding:11px;max-width:88%;align-self:flex-end;">
+        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:7px;display:flex;justify-content:space-between;">Cotización enviada <span class="badge bo" style="font-size:9px;">Pendiente</span></div>
+        <div style="font-size:11px;color:var(--text2);border-top:1px solid var(--border);padding-top:6px;line-height:1.8;">Aguacate Hass · 200 kg<br>Precio: $28/kg · Envío: Incluido<br><span style="font-weight:700;color:var(--text);">Total: $5,600 MXN</span></div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <button style="width:32px;height:32px;border-radius:8px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <input placeholder="Escribe un mensaje...">
+      <button class="send-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+  <!-- PERFIL PROVEEDOR (editable) -->
+  <div class="screen" id="s-prov-myprofile">
+    <div class="sb"><span class="time">9:41</span></div>
+
+    <!-- Header naranja limpio -->
+    <div style="background:var(--org);padding:0 18px 20px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span style="font-size:16px;font-weight:800;color:#fff;">Mi perfil</span>
+        <button style="background:rgba(255,255,255,.2);border:none;border-radius:9px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">Editar</button>
+      </div>
+      <!-- Avatar + nombre -->
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:62px;height:62px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--org);flex-shrink:0;">RF</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:2px;">Rancho El Fresno</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <svg class="ico" viewBox="0 0 24 24" width="11" height="11" style="color:rgba(255,255,255,.8)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Uruapan, Michoacán
+          </div>
+          <span style="background:rgba(255,255,255,.25);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;">
+            Verificado ✓
+          </span>
+        </div>
       </div>
     </div>
 
-    <!-- ════════════════════════════════ -->
-    <!-- PHONE 2: PERFIL PROVEEDOR PRO   -->
-    <!-- ════════════════════════════════ -->
-    <div class="phone-col">
-      <div class="phone-label">Perfil Proveedor — Vista Pro</div>
-      <div class="phone" id="phone2">
-
-        <!-- HOME PROVEEDOR -->
-        <div class="screen" id="p2-home-prov">
-          <div style="background:var(--org);padding:0 18px 0;">
-            <div class="status-bar" style="height:36px;"><span class="time" style="color:#fff;">9:41</span></div>
-          </div>
-          <div style="background:var(--org);padding:10px 18px 18px;flex-shrink:0;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-              <div>
-                <div style="font-size:11px;color:rgba(255,255,255,.75);font-weight:600;">Bienvenido de vuelta</div>
-                <div style="font-size:18px;font-weight:800;color:#fff;">Rancho El Fresno</div>
-              </div>
-              <div style="background:rgba(255,255,255,.2);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:800;">RF</div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">
-              <div style="background:rgba(255,255,255,.2);border-radius:12px;padding:10px 8px;text-align:center;">
-                <div style="font-size:18px;font-weight:800;color:#fff;">342</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.8);">Visitas</div>
-              </div>
-              <div style="background:rgba(255,255,255,.2);border-radius:12px;padding:10px 8px;text-align:center;">
-                <div style="font-size:18px;font-weight:800;color:#fff;">47</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.8);">Contactos</div>
-              </div>
-              <div style="background:rgba(255,255,255,.2);border-radius:12px;padding:10px 8px;text-align:center;">
-                <div style="font-size:18px;font-weight:800;color:#fff;">4.9</div>
-                <div style="font-size:9px;color:rgba(255,255,255,.8);">Rating</div>
-              </div>
-            </div>
-          </div>
-          <div class="scroll pad" style="padding-top:14px;">
-            <div class="sec-hdr"><span class="s-title">Solicitudes recientes</span><span class="s-link">Ver todas</span></div>
-            <!-- Request card -->
-            <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:10px;">
-              <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
-                <div style="width:36px;height:36px;border-radius:11px;background:var(--org-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--org);flex-shrink:0;">MG</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:700;color:var(--text);">María González</div>
-                  <div style="font-size:11px;color:var(--text3);">Tehuacán, Puebla · Hace 15 min</div>
-                </div>
-                <span class="badge badge-orange">Nueva</span>
-              </div>
-              <div style="font-size:12px;color:var(--text2);background:var(--gray-l);border-radius:9px;padding:9px;margin-bottom:9px;line-height:1.5;">Necesito 200 kg de aguacate Hass. ¿Tienen para esta semana?</div>
-              <div style="display:flex;gap:7px;">
-                <button class="btn btn-primary btn-sm" style="flex:1;" onclick="go('p2-home-prov','p2-chat-prov')">Responder</button>
-                <button class="btn btn-gray btn-sm">Ver perfil</button>
-              </div>
-            </div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:10px;">
-              <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;">
-                <div style="width:36px;height:36px;border-radius:11px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#1D4ED8;flex-shrink:0;">CM</div>
-                <div style="flex:1;">
-                  <div style="font-size:13px;font-weight:700;color:var(--text);">Carlos Mendoza</div>
-                  <div style="font-size:11px;color:var(--text3);">CDMX · Hace 2 horas</div>
-                </div>
-                <span class="badge badge-gray">Pendiente</span>
-              </div>
-              <div style="font-size:12px;color:var(--text2);background:var(--gray-l);border-radius:9px;padding:9px;margin-bottom:9px;line-height:1.5;">¿Precio por 500 kg? Soy distribuidor, compro mensual.</div>
-              <div style="display:flex;gap:7px;">
-                <button class="btn btn-primary btn-sm" style="flex:1;">Responder</button>
-                <button class="btn btn-gray btn-sm">Ver perfil</button>
-              </div>
-            </div>
-            <div class="sec-hdr" style="margin-top:6px;"><span class="s-title">Rendimiento del mes</span></div>
-            <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:14px;">
-              <div style="margin-bottom:10px;">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Aguacate Hass</span><span style="font-weight:700;">168 vistas</span></div>
-                <div style="background:var(--gray-l);border-radius:99px;height:6px;"><div style="width:82%;height:6px;border-radius:99px;background:var(--org);"></div></div>
-              </div>
-              <div style="margin-bottom:10px;">
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Fresa fresca</span><span style="font-weight:700;">96 vistas</span></div>
-                <div style="background:var(--gray-l);border-radius:99px;height:6px;"><div style="width:47%;height:6px;border-radius:99px;background:var(--gray-d);"></div></div>
-              </div>
-              <div>
-                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;"><span>Uva Red Globe</span><span style="font-weight:700;">78 vistas</span></div>
-                <div style="background:var(--gray-l);border-radius:99px;height:6px;"><div style="width:38%;height:6px;border-radius:99px;background:var(--gray-d);"></div></div>
-              </div>
-            </div>
-            <div style="height:10px;"></div>
-          </div>
-          <div class="bnav">
-            <button class="bn active">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22" color="var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Inicio</span>
-            </button>
-            <button class="bn" onclick="go('p2-home-prov','p2-chat-prov')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Chat</span>
-            </button>
-            <button class="bn" onclick="go('p2-home-prov','p2-prov-profile')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Mi perfil</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- PERFIL PROVEEDOR (editable) -->
-        <div class="screen hide" id="p2-prov-profile">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="top-bar" style="padding-bottom:6px;">
-            <button class="back-btn" onclick="go('p2-prov-profile','p2-home-prov')">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-              Volver
-            </button>
-            <div class="title" style="flex:1;text-align:center;font-size:15px;">Mi perfil</div>
-            <button class="btn btn-gray btn-xs" style="width:auto;">Editar</button>
-          </div>
-          <div class="scroll">
-            <div class="profile-hero">
-              <div style="display:flex;align-items:flex-start;gap:12px;">
-                <div style="position:relative;">
-                  <div class="prof-avatar-lg" style="background:#F0FDF4;color:#15803D;">RF</div>
-                  <div style="position:absolute;bottom:-4px;right:-4px;width:22px;height:22px;background:var(--org);border-radius:99px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;">
-                    <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-                  </div>
-                </div>
-                <div style="flex:1;">
-                  <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
-                    <div class="prof-name-lg" style="font-size:17px;">Rancho El Fresno</div>
-                    <span class="badge badge-green">
-                      <svg class="ico" viewBox="0 0 24 24" width="9" height="9"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                      Pro
-                    </span>
-                  </div>
-                  <div class="prof-loc">
-                    <svg class="ico" viewBox="0 0 24 24" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                    Uruapan, Michoacán
-                  </div>
-                  <div style="display:flex;gap:4px;flex-wrap:wrap;">
-                    <span class="badge badge-orange">Agricultura</span>
-                    <span class="badge badge-orange">Mayoreo</span>
-                    <span class="badge" style="background:#FEF3C7;color:#B45309;">Menudeo</span>
-                  </div>
-                </div>
-              </div>
-              <div class="divider" style="margin:12px 0;"></div>
-              <div class="prof-stats">
-                <div class="prof-stat"><div class="n">4.9</div><div class="l">Calificación</div></div>
-                <div class="prof-stat"><div class="n">128</div><div class="l">Reseñas</div></div>
-                <div class="prof-stat"><div class="n">3 años</div><div class="l">Activo</div></div>
-                <div class="prof-stat"><div class="n">98%</div><div class="l">Respuesta</div></div>
-              </div>
-            </div>
-            <div class="pad">
-              <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.55;">Productores de aguacate Hass, fresa y uva de la Meseta Purépecha. Envíos a toda la república. Precio justo, calidad garantizada desde 2021.</div>
-              <div style="display:flex;gap:6px;margin-bottom:16px;">
-                <div style="flex:1;background:var(--gray-l);border-radius:12px;padding:10px;text-align:center;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Tiempo de respuesta</div>
-                  <div style="font-size:13px;font-weight:700;color:var(--text);">Menos de 1 hora</div>
-                </div>
-                <div style="flex:1;background:var(--gray-l);border-radius:12px;padding:10px;text-align:center;">
-                  <div style="font-size:10px;color:var(--text3);margin-bottom:2px;">Envío desde</div>
-                  <div style="font-size:13px;font-weight:700;color:var(--text);">$0 (100+ kg)</div>
-                </div>
-              </div>
-              <div class="sec-hdr"><span class="s-title">Mis productos</span><button class="btn btn-primary btn-xs" style="width:auto;">+ Agregar</button></div>
-              <div class="prod-grid">
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#DCFCE7;">
-                    <svg class="ico" viewBox="0 0 24 24" width="30" height="30" color="#15803D"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Aguacate Hass</div><div class="prod-price">$28 / kg</div></div>
-                </div>
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#FFE4E6;">
-                    <svg class="ico" viewBox="0 0 24 24" width="30" height="30" color="#BE123C"><circle cx="12" cy="12" r="5"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Fresa fresca</div><div class="prod-price">$35 / kg</div></div>
-                </div>
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#F5F3FF;">
-                    <svg class="ico" viewBox="0 0 24 24" width="30" height="30" color="#7C3AED"><circle cx="12" cy="12" r="4"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Uva Red Globe</div><div class="prod-price">$45 / kg</div></div>
-                </div>
-                <div class="prod-card">
-                  <div class="prod-img" style="background:#FFF7ED;">
-                    <svg class="ico" viewBox="0 0 24 24" width="30" height="30" color="var(--org)"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg>
-                  </div>
-                  <div class="prod-body"><div class="prod-name">Mango Ataulfo</div><div class="prod-price">$22 / kg</div></div>
-                </div>
-              </div>
-              <div class="sec-hdr"><span class="s-title">Certificaciones</span></div>
-              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;">
-                <span class="badge badge-green">SENASICA</span>
-                <span class="badge badge-green">SAGARPA</span>
-                <span class="badge" style="background:#F0FDF4;color:#15803D;">Inocuidad Alimentaria</span>
-              </div>
-              <div class="sec-hdr"><span class="s-title">Reseñas</span><span class="s-link">Ver todas (128)</span></div>
-              <div class="review">
-                <div class="review-top">
-                  <div class="review-avatar">AL</div>
-                  <div>
-                    <div class="review-name">Ana López</div>
-                    <div class="stars" style="margin-top:2px;">
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                      <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    </div>
-                  </div>
-                  <div class="review-date">Hace 3 días</div>
-                </div>
-                <div class="review-text">Excelente calidad, llegó en perfectas condiciones.</div>
-              </div>
-              <div style="height:16px;"></div>
-            </div>
-          </div>
-          <div class="bnav">
-            <button class="bn" onclick="go('p2-prov-profile','p2-home-prov')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-              <span>Inicio</span>
-            </button>
-            <button class="bn" onclick="go('p2-prov-profile','p2-chat-prov')">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              <span>Chat</span>
-            </button>
-            <button class="bn active">
-              <svg class="ico" viewBox="0 0 24 24" width="22" height="22" color="var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              <span>Mi perfil</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- CHAT PROVEEDOR -->
-        <div class="screen hide" id="p2-chat-prov">
-          <div class="status-bar"><span class="time">9:41</span></div>
-          <div class="chat-header">
-            <button class="back-btn" onclick="go('p2-chat-prov','p2-home-prov')" style="margin-right:4px;">
-              <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-            </button>
-            <div class="ch-av" style="background:var(--org-l);color:var(--org2);">MG</div>
-            <div style="flex:1;">
-              <div class="ch-name">María González</div>
-              <div class="ch-status">Comprador · Tehuacán</div>
-            </div>
-            <button class="icon-btn" style="background:var(--green-l);">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16" color="var(--green)"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
-            </button>
-          </div>
-          <div class="chat-messages">
-            <div class="msg msg-in">
-              <div class="msg-bubble">Hola, ¿tienen aguacate Hass disponible esta semana?</div>
-              <div class="msg-time">9:15</div>
-            </div>
-            <div class="msg msg-out">
-              <div class="msg-bubble">Sí, tenemos. ¿Cuántos kilos necesita?</div>
-              <div class="msg-time">9:17</div>
-            </div>
-            <div class="msg msg-in">
-              <div class="msg-bubble">200 kg para surtir mi negocio.</div>
-              <div class="msg-time">9:18</div>
-            </div>
-            <div class="msg msg-out">
-              <div class="msg-bubble">$28 / kg con envío incluido. Total: $5,600 MXN. Entrega en 2-3 días a Tehuacán.</div>
-              <div class="msg-time">9:20</div>
-            </div>
-            <!-- Cotización card -->
-            <div style="background:var(--gray-l);border-radius:14px;padding:12px;max-width:88%;align-self:flex-end;">
-              <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:8px;display:flex;justify-content:space-between;">
-                Cotización enviada
-                <span class="badge badge-orange" style="font-size:9px;">Pendiente</span>
-              </div>
-              <div style="font-size:11px;color:var(--text2);border-top:1px solid var(--border);padding-top:7px;line-height:1.8;">
-                Aguacate Hass · 200 kg<br>
-                Precio: $28/kg<br>
-                Envío: Incluido<br>
-                <span style="font-weight:700;color:var(--text);">Total: $5,600 MXN</span>
-              </div>
-            </div>
-          </div>
-          <div class="chat-input-bar">
-            <button class="icon-btn" style="width:34px;height:34px;flex-shrink:0;">
-              <svg class="ico" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-            </button>
-            <input placeholder="Escribe un mensaje...">
-            <button class="send-btn">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            </button>
-          </div>
-        </div>
-
-      </div><!-- /phone2 -->
-      <div style="font-size:11px;color:#aaa;text-align:center;max-width:280px;line-height:1.5;">
-        Vista del proveedor con <span style="color:var(--org);font-weight:700;">Plan Pro</span>.<br>Dashboard, perfil editable y chat.
+    <!-- Stats compactos -->
+    <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">4.9</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Calificación</div>
+      </div>
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">128</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Reseñas</div>
+      </div>
+      <div style="flex:1;padding:14px 0;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">3 años</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Activo</div>
       </div>
     </div>
 
-  </div><!-- /phones-row -->
-</div><!-- /demo-wrapper -->
+    <div class="scroll pad" style="padding-top:18px;">
+
+      <!-- Descripción — solo una línea de contexto -->
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;">
+        Frutas de la Meseta Purépecha. Mayoreo y menudeo. Envíos a toda la república.
+      </p>
+
+      <!-- Productos — lista limpia, no grid -->
+      <div class="sh"><span class="st">Productos</span><button class="btn btn-p btn-xs">+ Agregar</button></div>
+      <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Aguacate Hass</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 50 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$28/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Fresa fresca</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 20 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$35/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Uva Red Globe</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 30 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$45/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Mango Ataulfo</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 25 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$22/kg</div>
+        </div>
+      </div>
+
+      <!-- Última reseña — solo una, limpia -->
+      <div class="sh"><span class="st">Reseñas</span><span class="sl">Ver todas (128)</span></div>
+      <div style="border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:99px;background:var(--org-l);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--org);">AL</div>
+            <span style="font-size:13px;font-weight:700;color:var(--text);">Ana López</span>
+          </div>
+          <div style="display:flex;gap:1px;">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.55;">Excelente calidad y precio justo. Muy puntual con la entrega. Ya le compré 3 veces.</p>
+      </div>
+
+      <div style="height:6px;"></div>
+    </div>
+
+    <div class="bnav">
+      <button class="bn" onclick="provNav('s-prov-home','b-prov-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" onclick="provNav('s-prov-chat','b-prov-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn active" id="b-prov-profile">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi perfil</span>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /phone -->
 
 <script>
+let currentMode = 'buyer';
+
 // Splash auto-advance
-setTimeout(()=>go('p1-splash','p1-auth'), 1800);
+setTimeout(() => go('s-splash', 's-auth'), 1800);
 
-function go(from, to){
-  const f=document.getElementById(from);
-  const t=document.getElementById(to);
-  if(f) f.classList.add('hide');
-  if(t) t.classList.remove('hide');
+function go(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  if (f) f.classList.remove('active');
+  if (t) t.classList.add('active');
 }
 
-function navBuyer(btn, screenId){
-  const phone=document.getElementById('phone1');
-  phone.querySelectorAll('.bnav .bn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  ['p1-home-buyer','p1-chat-list','p1-user-profile'].forEach(id=>{
-    const s=document.getElementById(id);
-    if(s) s.classList.add('hide');
+function loginAs() {
+  if (currentMode === 'buyer') {
+    hideAll();
+    document.getElementById('s-buyer-home').classList.add('active');
+  } else {
+    hideAll();
+    document.getElementById('s-prov-home').classList.add('active');
+  }
+}
+
+function hideAll() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-buyer').classList.toggle('active', mode === 'buyer');
+  document.getElementById('btn-prov').classList.toggle('active', mode === 'prov');
+  hideAll();
+  if (mode === 'buyer') {
+    document.getElementById('s-auth').classList.add('active');
+  } else {
+    document.getElementById('s-prov-home').classList.add('active');
+  }
+}
+
+function buyerNav(screenId, btnId) {
+  const buyerScreens = ['s-buyer-home','s-buyer-chat','s-buyer-myprofile'];
+  buyerScreens.forEach(id => {
+    const s = document.getElementById(id);
+    if (s) s.classList.remove('active');
   });
-  const target=document.getElementById(screenId);
-  if(target) target.classList.remove('hide');
+  document.querySelectorAll('#s-buyer-home .bnav .bn, #s-buyer-chat .bnav .bn, #s-buyer-myprofile .bnav .bn').forEach(b => b.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
 }
 
-function selectRole(role){
-  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('selected'));
-  const el=document.getElementById('role-'+role);
-  if(el) el.classList.add('selected');
+function provNav(screenId, btnId) {
+  const provScreens = ['s-prov-home','s-prov-chat','s-prov-myprofile'];
+  provScreens.forEach(id => {
+    const s = document.getElementById(id);
+    if (s) s.classList.remove('active');
+  });
+  document.querySelectorAll('#s-prov-home .bnav .bn, #s-prov-chat .bnav .bn, #s-prov-myprofile .bnav .bn').forEach(b => b.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
 }
 
-function selectPlan(plan){
-  document.querySelectorAll('.plan-card').forEach(c=>c.classList.remove('selected'));
-  const el=document.getElementById('plan-'+plan);
-  if(el) el.classList.add('selected');
+function selRole(role) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('rc-' + role).classList.add('sel');
+  currentMode = role === 'prov' ? 'prov' : 'buyer';
 }
 
-// Default selections
-selectRole('buyer');
-selectPlan('free');
+function selPlan(plan) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('plan-' + plan).classList.add('sel');
+}
+
+function toggleChip(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
 </script>
 </body>
 </html>
