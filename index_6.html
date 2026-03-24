@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>¡Ven Ya! — Prototipo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --org:#F97316;--org2:#EA6C10;--org-l:#FFF4EE;--org-ll:#FEE9D9;
+  --gray-l:#F7F7F7;--gray-m:#E5E7EB;--gray-d:#9CA3AF;
+  --text:#111827;--text2:#6B7280;--text3:#9CA3AF;
+  --border:#EBEBEB;--green:#22C55E;--green-l:#F0FDF4;
+}
+body{font-family:'Plus Jakarta Sans',system-ui,sans-serif;background:#DDDCDB;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;}
+
+/* MODE SWITCHER */
+.mode-switch{display:flex;background:#fff;border-radius:14px;padding:5px;gap:4px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
+.mode-btn{padding:10px 24px;border-radius:10px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;color:var(--text2);background:transparent;}
+.mode-btn.active{background:var(--org);color:#fff;}
+
+/* PHONE */
+.phone{width:360px;height:740px;background:#fff;border-radius:40px;overflow:hidden;position:relative;box-shadow:0 24px 64px rgba(0,0,0,.22),0 0 0 1px rgba(0,0,0,.06);}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;background:#fff;overflow:hidden;}
+.screen.active{display:flex;}
+
+/* STATUS BAR */
+.sb{height:40px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+.sb .time{font-size:13px;font-weight:700;color:var(--text);}
+.sb.white .time{color:#fff;}
+.sb-icons{display:flex;gap:4px;align-items:center;}
+
+/* TOP BAR */
+.topbar{display:flex;align-items:center;padding:2px 18px 12px;flex-shrink:0;gap:10px;}
+.topbar-title{font-size:17px;font-weight:800;color:var(--text);flex:1;}
+.back-btn{display:flex;align-items:center;gap:5px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:700;color:var(--text);}
+
+/* SCROLL */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;}
+.scroll::-webkit-scrollbar{display:none;}
+.pad{padding:0 18px;}
+
+/* BOTTOM NAV */
+.bnav{display:flex;background:#fff;border-top:1px solid var(--border);flex-shrink:0;padding:8px 0 18px;}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;cursor:pointer;border:none;background:none;font-family:inherit;}
+.bn span{font-size:10px;font-weight:700;color:var(--text3);}
+.bn.active span{color:var(--org);}
+
+/* BUTTONS */
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;width:100%;padding:14px;border:none;border-radius:13px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;transition:transform .12s,opacity .12s;}
+.btn:active{transform:scale(.97);}
+.btn-p{background:var(--org);color:#fff;}
+.btn-o{background:#fff;color:var(--org);border:1.5px solid var(--org);}
+.btn-g{background:var(--gray-l);color:var(--text);}
+.btn-green{background:var(--green-l);color:#15803D;}
+.btn-sm{padding:9px 14px;font-size:12px;border-radius:10px;}
+.btn-xs{padding:7px 12px;font-size:11px;border-radius:8px;width:auto;}
+
+/* INPUTS */
+.ig{margin-bottom:14px;}
+.lbl{display:block;font-size:11px;font-weight:700;color:var(--text2);letter-spacing:.05em;text-transform:uppercase;margin-bottom:5px;}
+.inp{width:100%;padding:13px 14px;border:1.5px solid var(--border);border-radius:12px;font-family:inherit;font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s;appearance:none;}
+.inp:focus{border-color:var(--org);box-shadow:0 0 0 3px rgba(249,115,22,.1);}
+.inp::placeholder{color:var(--text3);}
+.inp-wrap{position:relative;}
+.inp-wrap .inp{padding-left:40px;}
+.inp-wrap svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:17px;height:17px;}
+
+/* ROLE CARDS */
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.role-card{border:1.5px solid var(--border);border-radius:13px;padding:14px 10px;cursor:pointer;text-align:center;transition:all .15s;}
+.role-card.sel{border-color:var(--org);background:var(--org-l);}
+.rc-icon{width:38px;height:38px;border-radius:10px;background:var(--gray-l);margin:0 auto 8px;display:flex;align-items:center;justify-content:center;}
+.role-card.sel .rc-icon{background:var(--org-ll);}
+.rc-title{font-size:13px;font-weight:700;color:var(--text);}
+.rc-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+
+/* PLAN CARDS */
+.plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;}
+.plan-card{border:1.5px solid var(--border);border-radius:13px;padding:14px 12px;cursor:pointer;position:relative;transition:all .15s;}
+.plan-card.sel{border-color:var(--org);background:var(--org-l);}
+.pc-tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--org);color:#fff;font-size:9px;font-weight:800;padding:3px 10px;border-radius:99px;white-space:nowrap;}
+.pc-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.plan-card.sel .pc-name{color:var(--org);}
+.pc-price{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.pc-feat{font-size:10px;color:var(--text2);line-height:1.8;}
+
+/* SEARCH */
+.searchbar{display:flex;align-items:center;gap:9px;background:var(--gray-l);border-radius:13px;padding:11px 14px;margin-bottom:14px;}
+.searchbar input{background:none;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--text);flex:1;}
+.searchbar input::placeholder{color:var(--text3);}
+
+/* CHIPS */
+.chips{display:flex;gap:6px;overflow-x:auto;margin-bottom:16px;padding-bottom:2px;}
+.chips::-webkit-scrollbar{display:none;}
+.chip{padding:7px 14px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap;cursor:pointer;border:1.5px solid var(--border);background:#fff;color:var(--text2);transition:all .15s;flex-shrink:0;}
+.chip.on{background:var(--org);color:#fff;border-color:var(--org);}
+
+/* PROVIDER CARD */
+.pcard{display:flex;gap:12px;background:#fff;border:1px solid var(--border);border-radius:15px;padding:13px;margin-bottom:10px;}
+.pav{width:52px;height:52px;border-radius:13px;background:var(--gray-l);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:var(--org);}
+.pinfo{flex:1;min-width:0;}
+.pname{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.ploc{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:3px;margin-bottom:5px;}
+.pcat{font-size:10px;font-weight:700;color:var(--org);background:var(--org-l);padding:2px 8px;border-radius:99px;display:inline-block;margin-bottom:5px;}
+.stars-row{display:flex;align-items:center;gap:4px;}
+.stars svg{width:10px;height:10px;}
+
+/* SECTION HEADER */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.sh .st{font-size:14px;font-weight:800;color:var(--text);}
+.sh .sl{font-size:12px;font-weight:600;color:var(--org);cursor:pointer;}
+
+/* DIVIDER */
+.div{height:1px;background:var(--border);margin:14px 0;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;}
+.bg{background:var(--green-l);color:#15803D;}
+.bo{background:var(--org-l);color:var(--org2);}
+.bgr{background:var(--gray-l);color:var(--text2);}
+
+/* PROFILE HERO */
+.prof-hero{background:var(--gray-l);border-radius:0 0 22px 22px;padding:14px 18px 18px;flex-shrink:0;}
+.av-lg{width:68px;height:68px;border-radius:18px;background:#fff;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;color:var(--org);}
+.pname-lg{font-size:19px;font-weight:800;color:var(--text);margin-bottom:2px;}
+.ploc-lg{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:4px;margin-bottom:8px;}
+.pstats{display:flex;gap:0;}
+.pstat{flex:1;text-align:center;}
+.pstat .n{font-size:16px;font-weight:800;color:var(--text);}
+.pstat .l{font-size:10px;color:var(--text3);}
+
+/* REVIEW */
+.rev{background:var(--gray-l);border-radius:12px;padding:11px;margin-bottom:8px;}
+.rev-top{display:flex;align-items:center;gap:8px;margin-bottom:5px;}
+.rev-av{width:26px;height:26px;border-radius:99px;background:var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--org);flex-shrink:0;}
+.rev-name{font-size:12px;font-weight:700;color:var(--text);}
+.rev-date{font-size:10px;color:var(--text3);margin-left:auto;}
+.rev-txt{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* PRODUCTS */
+.prod-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+.prod-card{background:var(--gray-l);border-radius:13px;overflow:hidden;}
+.prod-img{height:70px;display:flex;align-items:center;justify-content:center;}
+.prod-body{padding:8px 10px;}
+.prod-name{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.prod-price{font-size:12px;font-weight:800;color:var(--org);}
+
+/* CHAT */
+.chat-item{display:flex;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.chat-av{width:44px;height:44px;border-radius:13px;background:var(--gray-l);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--org);flex-shrink:0;}
+.chat-name{font-size:13px;font-weight:700;color:var(--text);}
+.chat-prev{font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.chat-time{font-size:10px;color:var(--text3);}
+.chat-unread{width:18px;height:18px;background:var(--org);border-radius:99px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;}
+.chat-hdr{display:flex;align-items:center;gap:10px;padding:4px 14px 12px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.ch-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.ch-name{font-size:14px;font-weight:700;color:var(--text);}
+.ch-status{font-size:11px;color:var(--green);}
+.msgs{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:9px;}
+.msgs::-webkit-scrollbar{display:none;}
+.msg{max-width:80%;}
+.msg-out{align-self:flex-end;}
+.msg-in{align-self:flex-start;}
+.bubble{padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.5;}
+.msg-out .bubble{background:var(--org);color:#fff;border-bottom-right-radius:4px;}
+.msg-in .bubble{background:var(--gray-l);color:var(--text);border-bottom-left-radius:4px;}
+.msg-time{font-size:10px;color:var(--text3);margin-top:3px;text-align:right;}
+.msg-in .msg-time{text-align:left;}
+.chat-input{display:flex;align-items:center;gap:8px;padding:10px 14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
+.chat-input input{flex:1;border:1.5px solid var(--border);border-radius:99px;padding:10px 14px;font-family:inherit;font-size:13px;background:#fff;outline:none;}
+.chat-input input:focus{border-color:var(--org);}
+.send-btn{width:38px;height:38px;border-radius:99px;background:var(--org);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+
+/* USER PROFILE */
+.user-hero{background:var(--gray-l);padding:20px 18px;display:flex;flex-direction:column;align-items:center;border-radius:0 0 22px 22px;flex-shrink:0;}
+.user-av{width:76px;height:76px;border-radius:99px;background:#fff;border:3px solid var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:var(--org);margin-bottom:9px;}
+.user-name{font-size:18px;font-weight:800;color:var(--text);margin-bottom:2px;}
+.user-loc{font-size:12px;color:var(--text3);margin-bottom:10px;}
+.user-type{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;}
+
+/* SETTING ROW */
+.srow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.srow:last-child{border-bottom:none;}
+.sicon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.slabel{font-size:13px;font-weight:600;color:var(--text);flex:1;}
+.sval{font-size:12px;color:var(--text3);}
+
+/* PREMIUM BANNER */
+.prem-banner{background:var(--org);border-radius:15px;padding:14px 16px;margin-bottom:16px;color:#fff;}
+.pb-t{font-size:14px;font-weight:800;margin-bottom:3px;}
+.pb-s{font-size:11px;opacity:.85;margin-bottom:10px;line-height:1.4;}
+.pb-btn{background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);border-radius:8px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;padding:7px 14px;cursor:pointer;}
+
+/* STATS MINI */
+.mini-stats{display:flex;background:var(--gray-l);border-radius:13px;padding:12px;margin-bottom:14px;}
+.ms{flex:1;text-align:center;}
+.ms:not(:last-child){border-right:1px solid var(--border);}
+.ms .mn{font-size:16px;font-weight:800;color:var(--text);}
+.ms .ml{font-size:10px;color:var(--text3);margin-top:1px;}
+
+/* PROGRESS */
+.prog-dots{display:flex;gap:5px;margin-bottom:18px;}
+.dot{width:7px;height:7px;border-radius:99px;background:var(--border);}
+.dot.on{background:var(--org);width:22px;}
+
+/* SPLASH */
+.splash{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;background:#fff;}
+.splash-logo{font-size:44px;font-weight:900;color:var(--org);letter-spacing:-1px;margin-bottom:6px;}
+.splash-tag{font-size:13px;color:var(--text3);font-weight:500;}
+.splash-dot{width:8px;height:8px;border-radius:99px;background:var(--org);margin-top:36px;animation:pulse 1.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+
+/* AUTH */
+.auth-logo{font-size:34px;font-weight:900;color:var(--org);text-align:center;margin-bottom:4px;}
+.auth-sub{font-size:13px;color:var(--text3);text-align:center;margin-bottom:28px;}
+.div-txt{display:flex;align-items:center;gap:10px;margin:14px 0;}
+.div-txt span{font-size:12px;color:var(--text3);white-space:nowrap;}
+.div-txt::before,.div-txt::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* PROV DASHBOARD */
+.prov-top-bar{background:var(--org);padding:0 18px;}
+.prov-header{background:var(--org);padding:10px 18px 18px;flex-shrink:0;}
+.prov-greeting{font-size:11px;color:rgba(255,255,255,.75);font-weight:600;}
+.prov-biz{font-size:18px;font-weight:800;color:#fff;margin-bottom:12px;}
+.prov-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.prov-stat{background:rgba(255,255,255,.2);border-radius:11px;padding:10px;text-align:center;}
+.prov-stat .n{font-size:18px;font-weight:800;color:#fff;}
+.prov-stat .l{font-size:9px;color:rgba(255,255,255,.8);}
+
+/* REQUEST CARD */
+.req-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:10px;}
+.req-top{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;}
+.req-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.req-name{font-size:13px;font-weight:700;color:var(--text);}
+.req-info{font-size:11px;color:var(--text3);}
+.req-msg{font-size:12px;color:var(--text2);background:var(--gray-l);border-radius:9px;padding:9px;margin-bottom:9px;line-height:1.5;}
+.req-btns{display:flex;gap:7px;}
+
+/* BAR CHART */
+.bar-item{margin-bottom:9px;}
+.bar-hdr{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:4px;}
+.bar-bg{background:var(--gray-l);border-radius:99px;height:6px;}
+.bar-fg{height:6px;border-radius:99px;background:var(--org);}
+
+/* ICON HELPER */
+.ico{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+</style>
+</head>
+<body>
+
+<!-- MODE SWITCHER -->
+<div style="font-size:11px;font-weight:700;color:#999;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;">¡Ven Ya! — Prototipo interactivo</div>
+<div class="mode-switch">
+  <button class="mode-btn active" id="btn-buyer" onclick="setMode('buyer')">Comprador</button>
+  <button class="mode-btn" id="btn-prov" onclick="setMode('prov')">Proveedor</button>
+</div>
+
+<div class="phone">
+
+  <!-- ══════════════════════ -->
+  <!-- SPLASH                -->
+  <!-- ══════════════════════ -->
+  <div class="screen active" id="s-splash">
+    <div class="splash">
+      <div class="splash-logo">¡Ven Ya!</div>
+      <div class="splash-tag">Conecta con proveedores locales</div>
+      <div class="splash-dot"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════ -->
+  <!-- AUTH — BIENVENIDA         -->
+  <!-- ══════════════════════════ -->
+  <div class="screen" id="s-auth">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="scroll pad" style="padding-top:32px;">
+      <div class="auth-logo">¡Ven Ya!</div>
+      <div class="auth-sub">Conecta con proveedores locales</div>
+
+      <!-- Tabs Iniciar / Crear -->
+      <div style="display:flex;background:var(--gray-l);border-radius:12px;padding:4px;gap:4px;margin-bottom:24px;">
+        <button id="tab-login" onclick="authTab('login')" style="flex:1;padding:9px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:var(--org);color:#fff;transition:all .18s;">Iniciar sesión</button>
+        <button id="tab-register" onclick="authTab('register')" style="flex:1;padding:9px;border-radius:9px;border:none;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;background:transparent;color:var(--text2);transition:all .18s;">Crear cuenta</button>
+      </div>
+
+      <!-- PANEL INICIAR SESIÓN -->
+      <div id="panel-login">
+        <div class="ig">
+          <span class="lbl">Correo o teléfono</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="inp" placeholder="correo@ejemplo.com" value="maria@gmail.com">
+          </div>
+        </div>
+        <div class="ig">
+          <span class="lbl">Contraseña</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input class="inp" placeholder="••••••••" type="password" value="••••••••">
+          </div>
+        </div>
+        <p style="text-align:right;font-size:12px;margin-bottom:18px;"><span style="color:var(--org);font-weight:700;cursor:pointer;">¿Olvidaste tu contraseña?</span></p>
+        <button class="btn btn-p" onclick="loginAs()">Iniciar sesión</button>
+        <div class="div-txt" style="margin:14px 0;"><span>o continúa con</span></div>
+        <button onclick="loginAs()" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1.5px solid var(--border);border-radius:13px;background:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--text);transition:all .15s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Iniciar con Google
+        </button>
+        <p style="text-align:center;font-size:12px;color:var(--text3);margin-top:16px;">¿No tienes cuenta? <span style="color:var(--org);font-weight:700;cursor:pointer;" onclick="authTab('register')">Regístrate gratis</span></p>
+      </div>
+
+      <!-- PANEL CREAR CUENTA (paso 0 del registro) -->
+      <div id="panel-register" style="display:none;">
+        <div class="ig">
+          <span class="lbl">Nombre completo o empresa</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input class="inp" placeholder="Ej. María González">
+          </div>
+        </div>
+        <div class="ig">
+          <span class="lbl">Correo electrónico</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <input class="inp" placeholder="correo@ejemplo.com" type="email">
+          </div>
+        </div>
+        <div class="ig">
+          <span class="lbl">Número de teléfono <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-size:10px;">(opcional)</span></span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            <input class="inp" placeholder="Ej. 2381234567" type="tel">
+          </div>
+        </div>
+        <div class="ig">
+          <span class="lbl">Contraseña</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input class="inp" placeholder="Mínimo 6 caracteres" type="password">
+          </div>
+        </div>
+        <div class="ig">
+          <span class="lbl">Confirmar contraseña</span>
+          <div class="inp-wrap">
+            <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input class="inp" placeholder="Repite tu contraseña" type="password">
+          </div>
+        </div>
+        <button class="btn btn-p" onclick="go('s-auth','s-reg1')">Continuar</button>
+        <div class="div-txt" style="margin:14px 0;"><span>o regístrate con</span></div>
+        <button onclick="go('s-auth','s-reg1')" style="display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border:1.5px solid var(--border);border-radius:13px;background:#fff;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;color:var(--text);transition:all .15s;">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+          Continuar con Google
+        </button>
+        <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:12px;line-height:1.5;">Al continuar aceptas nuestros <span style="color:var(--org);cursor:pointer;">Términos de uso</span> y <span style="color:var(--org);cursor:pointer;">Aviso de privacidad</span></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- REGISTRO PASO 1 — ROL + ZONA  -->
+  <!-- ══════════════════════════════ -->
+  <div class="screen" id="s-reg1">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="go('s-reg1','s-auth')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+    </div>
+    <div class="scroll pad">
+      <!-- Progreso: paso 2 de 3 -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;">
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--org);"></div>
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--org);"></div>
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--border);"></div>
+        <span style="font-size:11px;color:var(--text3);font-weight:600;white-space:nowrap;">2 de 3</span>
+      </div>
+      <div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:4px;">¿Dónde estás?</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">Para mostrarte proveedores de tu zona.</p>
+      <div class="ig">
+        <span class="lbl">Estado</span>
+        <select class="inp">
+          <option>Puebla</option><option>CDMX</option><option>Jalisco</option><option>Michoacán</option><option>Veracruz</option><option>Oaxaca</option><option>Guerrero</option><option>Hidalgo</option><option>Tlaxcala</option>
+        </select>
+      </div>
+      <div class="ig">
+        <span class="lbl">Municipio o región</span>
+        <input class="inp" placeholder="Ej. Tehuacán" value="Tehuacán">
+      </div>
+      <div class="ig">
+        <span class="lbl">Código postal</span>
+        <div class="inp-wrap">
+          <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <input class="inp" placeholder="Ej. 75700" type="number" maxlength="5">
+        </div>
+      </div>
+      <div style="margin-bottom:20px;">
+        <span class="lbl" style="margin-bottom:10px;display:block;">¿Qué quieres hacer en ¡Ven Ya!?</span>
+        <div class="role-grid">
+          <div class="role-card sel" id="rc-buyer" onclick="selRole('buyer')">
+            <div class="rc-icon">
+              <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            </div>
+            <div class="rc-title">Comprador</div>
+            <div class="rc-sub">Busco productos y servicios</div>
+          </div>
+          <div class="role-card" id="rc-prov" onclick="selRole('prov')">
+            <div class="rc-icon">
+              <svg class="ico" viewBox="0 0 24 24" width="20" height="20"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+            </div>
+            <div class="rc-title">Proveedor</div>
+            <div class="rc-sub">Vendo productos y servicios</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-p" onclick="go('s-reg1','s-reg2')">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════ -->
+  <!-- REGISTRO PASO 3 — PLAN-->
+  <!-- ══════════════════════ -->
+  <div class="screen" id="s-reg2">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar">
+      <button class="back-btn" onclick="go('s-reg2','s-reg1')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+    </div>
+    <div class="scroll pad">
+      <!-- Progreso: paso 3 de 3 -->
+      <div style="display:flex;align-items:center;gap:6px;margin-bottom:20px;">
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--org);"></div>
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--org);"></div>
+        <div style="flex:1;height:4px;border-radius:99px;background:var(--org);"></div>
+        <span style="font-size:11px;color:var(--text3);font-weight:600;white-space:nowrap;">3 de 3</span>
+      </div>
+      <div style="font-size:19px;font-weight:800;color:var(--text);margin-bottom:4px;">Elige tu plan</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:22px;">Puedes cambiarlo cuando quieras.</p>
+      <div class="plan-grid">
+        <div class="plan-card sel" id="plan-free" onclick="selPlan('free')">
+          <div class="pc-name">Gratuito</div>
+          <div class="pc-price">$0 / mes</div>
+          <div class="pc-feat">Buscar proveedores<br>Ver perfiles<br>Chat básico<br>—<br>—</div>
+        </div>
+        <div class="plan-card" id="plan-pro" onclick="selPlan('pro')" style="border-color:var(--org);">
+          <div class="pc-tag">Recomendado</div>
+          <div class="pc-name">Premium</div>
+          <div class="pc-price">$79 / mes</div>
+          <div class="pc-feat">Todo lo gratuito<br>Top 5 estrellas<br>Filtros avanzados<br>Videollamadas<br>Sin anuncios</div>
+        </div>
+      </div>
+      <button class="btn btn-p" style="margin-bottom:10px;" onclick="loginAs()">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:#fff"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        ¡Crear mi cuenta!
+      </button>
+      <button class="btn btn-g" onclick="loginAs()">Empezar gratis por ahora</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- HOME COMPRADOR                -->
+  <!-- ══════════════════════════════ -->
+  <div class="screen" id="s-buyer-home">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex-shrink:0;">
+      <div style="font-size:18px;font-weight:800;color:var(--text);">¡Ven Ya!</div>
+      <button style="width:36px;height:36px;border-radius:10px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;">
+        <svg class="ico" viewBox="0 0 24 24" width="17" height="17"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div style="position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--org);border-radius:99px;border:1.5px solid #fff;"></div>
+      </button>
+    </div>
+    <div class="scroll pad">
+      <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;">
+        <div class="searchbar" style="flex:1;margin-bottom:0;cursor:pointer;" onclick="go('s-buyer-home','s-search-results')">
+          <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:var(--text3);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input placeholder="Buscar proveedores o productos..." readonly style="cursor:pointer;" onclick="go('s-buyer-home','s-search-results')">
+        </div>
+        <button onclick="go('s-buyer-home','s-filters')" style="width:44px;height:44px;border-radius:12px;background:var(--org);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg class="ico" viewBox="0 0 24 24" width="17" height="17" style="color:#fff"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="chips">
+        <div class="chip on" onclick="toggleChip(this)">Todos</div>
+        <div class="chip" onclick="toggleChip(this)">Ropa</div>
+        <div class="chip" onclick="toggleChip(this)">Agricultura</div>
+        <div class="chip" onclick="toggleChip(this)">Animales</div>
+        <div class="chip" onclick="toggleChip(this)">Servicios</div>
+        <div class="chip" onclick="toggleChip(this)">Electrónicos</div>
+      </div>
+      <div class="sh"><span class="st">Proveedores en Tehuacán</span><span class="sl">Ver todos</span></div>
+
+      <div class="pcard">
+        <div class="pav" style="background:#F0FDF4;color:#15803D;">RF</div>
+        <div class="pinfo">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div class="pname">Rancho El Fresno</div>
+            <svg class="ico" viewBox="0 0 24 24" width="12" height="12" style="color:var(--green);flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Michoacán · 42 km</div>
+          <div class="pcat">Agricultura</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.9</span>
+            <span style="font-size:11px;color:var(--text3);">(128)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;" onclick="go('s-buyer-home','s-prov-profile')">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pav">PM</div>
+        <div class="pinfo">
+          <div class="pname">Paca Mayoreo MX</div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Puebla · 8 km</div>
+          <div class="pcat">Ropa</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#E5E7EB"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.2</span>
+            <span style="font-size:11px;color:var(--text3);">(64)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div class="pav" style="background:#F0F9FF;color:#0369A1;">TM</div>
+        <div class="pinfo">
+          <div class="pname">TechMayoreo</div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Guadalajara · 180 km</div>
+          <div class="pcat" style="background:#EFF6FF;color:#1D4ED8;">Electrónicos</div>
+          <div class="stars-row">
+            <div class="stars">
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            </div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.8</span>
+            <span style="font-size:11px;color:var(--text3);">(203)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn active" id="b-buyer-home">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" id="b-buyer-chat" onclick="buyerNav('s-buyer-chat','b-buyer-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" id="b-buyer-profile" onclick="buyerNav('s-buyer-myprofile','b-buyer-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════ -->
+  <!-- PERFIL DEL PROVEEDOR          -->
+  <!-- ══════════════════════════════ -->
+  <div class="screen" id="s-prov-profile">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar" style="padding-bottom:6px;">
+      <button class="back-btn" onclick="go('s-prov-profile','s-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <button style="width:34px;height:34px;border-radius:10px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+      </button>
+    </div>
+    <div class="scroll">
+      <div class="prof-hero">
+        <div style="display:flex;align-items:flex-start;gap:12px;">
+          <div class="av-lg" style="background:#F0FDF4;color:#15803D;">RF</div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:3px;">
+              <div class="pname-lg">Rancho El Fresno</div>
+              <span class="badge bg"><svg class="ico" viewBox="0 0 24 24" width="9" height="9"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Verificado</span>
+            </div>
+            <div class="ploc-lg"><svg class="ico" viewBox="0 0 24 24" width="11" height="11"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Uruapan, Michoacán</div>
+            <div style="display:flex;gap:4px;flex-wrap:wrap;">
+              <span class="badge bo">Agricultura</span>
+              <span class="badge bo">Mayoreo</span>
+            </div>
+          </div>
+        </div>
+        <div class="div"></div>
+        <div class="pstats">
+          <div class="pstat"><div class="n">4.9</div><div class="l">Calificación</div></div>
+          <div class="pstat"><div class="n">128</div><div class="l">Reseñas</div></div>
+          <div class="pstat"><div class="n">3 años</div><div class="l">Activo</div></div>
+          <div class="pstat"><div class="n">98%</div><div class="l">Responde</div></div>
+        </div>
+      </div>
+      <div class="pad">
+        <p style="font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:14px;">Productores de aguacate Hass, fresa y uva de la Meseta Purépecha. Envíos a toda la república. Precio justo, calidad garantizada.</p>
+        <div style="display:flex;gap:8px;margin-bottom:14px;">
+          <button class="btn btn-p" style="flex:1;" onclick="go('s-prov-profile','s-buyer-chatconv')">
+            <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#fff"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Enviar mensaje
+          </button>
+          <button class="btn btn-g" style="width:46px;padding:0;flex-shrink:0;">
+            <svg class="ico" viewBox="0 0 24 24" width="17" height="17"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button class="btn btn-green" style="width:46px;padding:0;flex-shrink:0;">
+            <svg class="ico" viewBox="0 0 24 24" width="17" height="17" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          </button>
+        </div>
+        <div class="sh"><span class="st">Productos</span></div>
+        <div class="prod-grid">
+          <div class="prod-card"><div class="prod-img" style="background:#DCFCE7;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#15803D"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg></div><div class="prod-body"><div class="prod-name">Aguacate Hass</div><div class="prod-price">$28 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#FFE4E6;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#BE123C"><circle cx="12" cy="12" r="6"/></svg></div><div class="prod-body"><div class="prod-name">Fresa fresca</div><div class="prod-price">$35 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#F5F3FF;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:#7C3AED"><circle cx="12" cy="12" r="5"/></svg></div><div class="prod-body"><div class="prod-name">Uva Red Globe</div><div class="prod-price">$45 / kg</div></div></div>
+          <div class="prod-card"><div class="prod-img" style="background:#FFF7ED;"><svg class="ico" viewBox="0 0 24 24" width="30" height="30" style="color:var(--org)"><path d="M12 2a9 9 0 0 1 9 9c0 5.25-9 13-9 13S3 16.25 3 11a9 9 0 0 1 9-9z"/></svg></div><div class="prod-body"><div class="prod-name">Mango Ataulfo</div><div class="prod-price">$22 / kg</div></div></div>
+        </div>
+        <div class="sh"><span class="st">Reseñas</span><span class="sl">Ver todas (128)</span></div>
+        <div class="rev">
+          <div class="rev-top">
+            <div class="rev-av">AL</div>
+            <div>
+              <div class="rev-name">Ana López</div>
+              <div class="stars" style="display:flex;gap:1px;margin-top:2px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </div>
+            <div class="rev-date">Hace 3 días</div>
+          </div>
+          <div class="rev-txt">Excelente calidad, llegó en perfectas condiciones. Muy buen trato y precio justo para mayoreo.</div>
+        </div>
+        <div class="rev">
+          <div class="rev-top">
+            <div class="rev-av" style="background:#EFF6FF;color:#1D4ED8;">RC</div>
+            <div>
+              <div class="rev-name">Roberto C.</div>
+              <div class="stars" style="display:flex;gap:1px;margin-top:2px;">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+            </div>
+            <div class="rev-date">Hace 1 sem</div>
+          </div>
+          <div class="rev-txt">Cuarta vez que compro. Siempre cumple con la calidad. 100% recomendado.</div>
+        </div>
+        <div style="height:16px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT LIST COMPRADOR -->
+  <div class="screen" id="s-buyer-chat">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="topbar"><div class="topbar-title">Mensajes</div></div>
+    <div class="scroll pad">
+      <div class="searchbar" style="margin-bottom:14px;">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:var(--text3);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input placeholder="Buscar en mensajes...">
+      </div>
+      <div class="chat-item" onclick="go('s-buyer-chat','s-buyer-chatconv')">
+        <div class="chat-av" style="background:#F0FDF4;color:#15803D;">RF</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">Rancho El Fresno</div>
+          <div class="chat-prev">Para cuándo necesita el pedido?</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="chat-time">10:24</div>
+          <div class="chat-unread">2</div>
+        </div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-av">PM</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">Paca Mayoreo MX</div>
+          <div class="chat-prev">Tú: Cuánto por 200 piezas?</div>
+        </div>
+        <div class="chat-time">Ayer</div>
+      </div>
+      <div class="chat-item">
+        <div class="chat-av" style="background:#F0F9FF;color:#0369A1;">TM</div>
+        <div style="flex:1;min-width:0;">
+          <div class="chat-name">TechMayoreo</div>
+          <div class="chat-prev">Los cargadores están disponibles</div>
+        </div>
+        <div class="chat-time">Lun</div>
+      </div>
+    </div>
+    <div class="bnav">
+      <button class="bn" onclick="buyerNav('s-buyer-home','b-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn active" id="b-buyer-chat">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" onclick="buyerNav('s-buyer-myprofile','b-buyer-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT CONVERSACIÓN COMPRADOR -->
+  <div class="screen" id="s-buyer-chatconv">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="chat-hdr">
+      <button class="back-btn" onclick="go('s-buyer-chatconv','s-buyer-chat')" style="margin-right:2px;">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="ch-av" style="background:#F0FDF4;color:#15803D;">RF</div>
+      <div style="flex:1;">
+        <div class="ch-name">Rancho El Fresno</div>
+        <div class="ch-status">En línea</div>
+      </div>
+      <button style="width:32px;height:32px;border-radius:9px;background:var(--green-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </button>
+    </div>
+    <div class="msgs">
+      <div class="msg msg-in"><div class="bubble">Hola, ¿tiene aguacate disponible esta semana?</div><div class="msg-time">9:15</div></div>
+      <div class="msg msg-out"><div class="bubble">Sí, tenemos. ¿Cuántos kilos necesita?</div><div class="msg-time">9:17</div></div>
+      <div class="msg msg-in"><div class="bubble">200 kg para surtir mi negocio.</div><div class="msg-time">9:18</div></div>
+      <div class="msg msg-out"><div class="bubble">$28/kg, envío incluido. Total: $5,600 MXN. Entrega en 2-3 días.</div><div class="msg-time">9:20</div></div>
+      <div class="msg msg-in"><div class="bubble">Perfecto. ¿Para cuándo puede ser?</div><div class="msg-time">9:22</div></div>
+    </div>
+    <div class="chat-input">
+      <button style="width:32px;height:32px;border-radius:8px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <input placeholder="Escribe un mensaje...">
+      <button class="send-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+  <!-- PERFIL USUARIO COMPRADOR -->
+  <div class="screen" id="s-buyer-myprofile">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="user-hero">
+      <div class="user-av">MG</div>
+      <div class="user-name">María González</div>
+      <div class="user-loc">Tehuacán, Puebla</div>
+      <span class="user-type" style="background:var(--org-l);color:var(--org2);">Comprador · Plan Gratuito</span>
+    </div>
+    <div class="scroll pad" style="padding-top:14px;">
+      <div class="prem-banner">
+        <div class="pb-t">Mejora a Premium</div>
+        <div class="pb-s">Accede a proveedores con 5 estrellas, filtros avanzados y videollamadas.</div>
+        <button class="pb-btn">Ver beneficios</button>
+      </div>
+      <div class="mini-stats">
+        <div class="ms"><div class="mn">12</div><div class="ml">Búsquedas</div></div>
+        <div class="ms"><div class="mn">3</div><div class="ml">Chats</div></div>
+        <div class="ms"><div class="mn">5</div><div class="ml">Guardados</div></div>
+      </div>
+      <div class="sh"><span class="st">Configuración</span></div>
+      <div class="srow" onclick="go('s-buyer-myprofile','s-edit-profile')" style="cursor:pointer;"><div class="sicon" style="background:var(--org-l);"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><span class="slabel">Editar perfil</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:#EFF6FF;"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#1D4ED8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><span class="slabel">Ubicación</span><span class="sval">Tehuacán, Pue.</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:var(--gray-l);"><svg class="ico" viewBox="0 0 24 24" width="15" height="15"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><span class="slabel">Notificaciones</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow" onclick="go('s-buyer-myprofile','s-terms')" style="cursor:pointer;"><div class="sicon" style="background:#FFF4EE;"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:var(--org)"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><span class="slabel">Términos y condiciones</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div class="srow"><div class="sicon" style="background:#FFF1F2;"><svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#E11D48"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg></div><span class="slabel">Cerrar sesión</span><svg class="ico" viewBox="0 0 24 24" width="13" height="13" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg></div>
+      <div style="height:16px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn" onclick="buyerNav('s-buyer-home','b-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" onclick="buyerNav('s-buyer-chat','b-buyer-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn active" id="b-buyer-profile">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PROVEEDOR — HOME / DASHBOARD      -->
+  <!-- ══════════════════════════════════ -->
+  <div class="screen" id="s-prov-home">
+    <div class="prov-top-bar">
+      <div class="sb white"><span class="time">9:41</span></div>
+    </div>
+    <div class="prov-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div>
+          <div class="prov-greeting">Bienvenido</div>
+          <div class="prov-biz">Rancho El Fresno</div>
+        </div>
+        <div style="background:rgba(255,255,255,.2);border-radius:12px;width:40px;height:40px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;font-weight:800;">RF</div>
+      </div>
+      <div class="prov-stats-grid">
+        <div class="prov-stat"><div class="n">342</div><div class="l">Visitas</div></div>
+        <div class="prov-stat"><div class="n">47</div><div class="l">Contactos</div></div>
+        <div class="prov-stat"><div class="n">4.9</div><div class="l">Rating</div></div>
+      </div>
+    </div>
+    <div class="scroll pad" style="padding-top:14px;">
+      <div class="sh"><span class="st">Solicitudes nuevas</span><span class="sl">Ver todas</span></div>
+      <div class="req-card">
+        <div class="req-top">
+          <div class="req-av" style="background:var(--org-l);color:var(--org2);">MG</div>
+          <div style="flex:1;">
+            <div class="req-name">María González</div>
+            <div class="req-info">Tehuacán, Puebla · Hace 15 min</div>
+          </div>
+          <span class="badge bo">Nueva</span>
+        </div>
+        <div class="req-msg">Necesito 200 kg de aguacate Hass. ¿Tienen para esta semana?</div>
+        <div class="req-btns">
+          <button class="btn btn-p btn-sm" style="flex:1;" onclick="go('s-prov-home','s-prov-chat')">Responder</button>
+          <button class="btn btn-g btn-sm">Ver perfil</button>
+        </div>
+      </div>
+      <div class="req-card">
+        <div class="req-top">
+          <div class="req-av" style="background:#EFF6FF;color:#1D4ED8;">CM</div>
+          <div style="flex:1;">
+            <div class="req-name">Carlos Mendoza</div>
+            <div class="req-info">CDMX · Hace 2 horas</div>
+          </div>
+          <span class="badge bgr">Pendiente</span>
+        </div>
+        <div class="req-msg">¿Precio por 500 kg? Soy distribuidor, compro mensual.</div>
+        <div class="req-btns">
+          <button class="btn btn-p btn-sm" style="flex:1;">Responder</button>
+          <button class="btn btn-g btn-sm">Ver perfil</button>
+        </div>
+      </div>
+      <div class="sh" style="margin-top:4px;"><span class="st">Rendimiento del mes</span></div>
+      <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:13px;margin-bottom:14px;">
+        <div class="bar-item"><div class="bar-hdr"><span>Aguacate Hass</span><span style="font-weight:700;">168 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:82%;"></div></div></div>
+        <div class="bar-item"><div class="bar-hdr"><span>Fresa fresca</span><span style="font-weight:700;">96 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:47%;background:var(--gray-d);"></div></div></div>
+        <div class="bar-item"><div class="bar-hdr"><span>Uva Red Globe</span><span style="font-weight:700;">78 vistas</span></div><div class="bar-bg"><div class="bar-fg" style="width:38%;background:var(--gray-d);"></div></div></div>
+      </div>
+      <div style="height:10px;"></div>
+    </div>
+    <div class="bnav">
+      <button class="bn active" id="b-prov-home">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" id="b-prov-chat" onclick="provNav('s-prov-chat','b-prov-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn" id="b-prov-profile" onclick="provNav('s-prov-myprofile','b-prov-profile')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi perfil</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- CHAT PROVEEDOR -->
+  <div class="screen" id="s-prov-chat">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div class="chat-hdr">
+      <button class="back-btn" onclick="go('s-prov-chat','s-prov-home')" style="margin-right:2px;">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div class="ch-av" style="background:var(--org-l);color:var(--org2);">MG</div>
+      <div style="flex:1;">
+        <div class="ch-name">María González</div>
+        <div class="ch-status">Comprador · Tehuacán</div>
+      </div>
+      <button style="width:32px;height:32px;border-radius:9px;background:var(--green-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:#15803D"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+      </button>
+    </div>
+    <div class="msgs">
+      <div class="msg msg-in"><div class="bubble">Hola, ¿tienen aguacate disponible esta semana?</div><div class="msg-time">9:15</div></div>
+      <div class="msg msg-out"><div class="bubble">Sí, tenemos. ¿Cuántos kilos necesita?</div><div class="msg-time">9:17</div></div>
+      <div class="msg msg-in"><div class="bubble">200 kg para surtir mi negocio.</div><div class="msg-time">9:18</div></div>
+      <div class="msg msg-out"><div class="bubble">$28/kg con envío incluido. Total: $5,600 MXN. Entrega en 2-3 días a Tehuacán.</div><div class="msg-time">9:20</div></div>
+      <div style="background:var(--gray-l);border-radius:13px;padding:11px;max-width:88%;align-self:flex-end;">
+        <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:7px;display:flex;justify-content:space-between;">Cotización enviada <span class="badge bo" style="font-size:9px;">Pendiente</span></div>
+        <div style="font-size:11px;color:var(--text2);border-top:1px solid var(--border);padding-top:6px;line-height:1.8;">Aguacate Hass · 200 kg<br>Precio: $28/kg · Envío: Incluido<br><span style="font-weight:700;color:var(--text);">Total: $5,600 MXN</span></div>
+      </div>
+    </div>
+    <div class="chat-input">
+      <button style="width:32px;height:32px;border-radius:8px;background:var(--gray-l);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      </button>
+      <input placeholder="Escribe un mensaje...">
+      <button class="send-btn"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+    </div>
+  </div>
+
+  <!-- PERFIL PROVEEDOR (editable) -->
+  <div class="screen" id="s-prov-myprofile">
+    <div class="sb"><span class="time">9:41</span></div>
+
+    <!-- Header naranja limpio -->
+    <div style="background:var(--org);padding:0 18px 20px;flex-shrink:0;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <span style="font-size:16px;font-weight:800;color:#fff;">Mi perfil</span>
+        <button onclick="go('s-prov-myprofile','s-edit-prov')" style="background:rgba(255,255,255,.2);border:none;border-radius:9px;padding:6px 12px;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">Editar</button>
+      </div>
+      <!-- Avatar + nombre -->
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="width:62px;height:62px;border-radius:18px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--org);flex-shrink:0;">RF</div>
+        <div>
+          <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:2px;">Rancho El Fresno</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:4px;margin-bottom:6px;">
+            <svg class="ico" viewBox="0 0 24 24" width="11" height="11" style="color:rgba(255,255,255,.8)"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Uruapan, Michoacán
+          </div>
+          <span style="background:rgba(255,255,255,.25);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px;">
+            Verificado ✓
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats compactos -->
+    <div style="display:flex;border-bottom:1px solid var(--border);flex-shrink:0;">
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">4.9</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Calificación</div>
+      </div>
+      <div style="flex:1;padding:14px 0;text-align:center;border-right:1px solid var(--border);">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">128</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Reseñas</div>
+      </div>
+      <div style="flex:1;padding:14px 0;text-align:center;">
+        <div style="font-size:18px;font-weight:800;color:var(--text);">3 años</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:1px;">Activo</div>
+      </div>
+    </div>
+
+    <div class="scroll pad" style="padding-top:18px;">
+
+      <!-- Descripción — solo una línea de contexto -->
+      <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;">
+        Frutas de la Meseta Purépecha. Mayoreo y menudeo. Envíos a toda la república.
+      </p>
+
+      <!-- Productos — lista limpia, no grid -->
+      <div class="sh"><span class="st">Productos</span><button class="btn btn-p btn-xs">+ Agregar</button></div>
+      <div style="border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Aguacate Hass</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 50 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$28/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Fresa fresca</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 20 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$35/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Uva Red Globe</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 30 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$45/kg</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--text);">Mango Ataulfo</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:1px;">Mayoreo · Min. 25 kg</div>
+          </div>
+          <div style="font-size:14px;font-weight:800;color:var(--org);">$22/kg</div>
+        </div>
+      </div>
+
+      <!-- Última reseña — solo una, limpia -->
+      <div class="sh"><span class="st">Reseñas</span><span class="sl">Ver todas (128)</span></div>
+      <div style="border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:28px;height:28px;border-radius:99px;background:var(--org-l);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--org);">AL</div>
+            <span style="font-size:13px;font-weight:700;color:var(--text);">Ana López</span>
+          </div>
+          <div style="display:flex;gap:1px;">
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <svg viewBox="0 0 24 24" width="11" height="11" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.55;">Excelente calidad y precio justo. Muy puntual con la entrega. Ya le compré 3 veces.</p>
+      </div>
+
+      <div style="height:6px;"></div>
+    </div>
+
+    <div class="bnav">
+      <button class="bn" onclick="provNav('s-prov-home','b-prov-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Inicio</span>
+      </button>
+      <button class="bn" onclick="provNav('s-prov-chat','b-prov-chat')">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <span>Chat</span>
+      </button>
+      <button class="bn active" id="b-prov-profile">
+        <svg class="ico" viewBox="0 0 24 24" width="22" height="22" style="color:var(--org)"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>Mi perfil</span>
+      </button>
+    </div>
+  </div>
+
+
+  <!-- ══════════════════════════════════ -->
+  <!-- BÚSQUEDA CON RESULTADOS           -->
+  <!-- ══════════════════════════════════ -->
+  <div class="screen" id="s-search-results">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="padding:4px 14px 10px;flex-shrink:0;display:flex;gap:8px;align-items:center;">
+      <button class="back-btn" onclick="go('s-search-results','s-buyer-home')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      </button>
+      <div style="flex:1;display:flex;align-items:center;gap:9px;background:var(--gray-l);border-radius:13px;padding:10px 13px;">
+        <svg class="ico" viewBox="0 0 24 24" width="15" height="15" style="color:var(--text3);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input id="search-input" style="background:none;border:none;outline:none;font-family:inherit;font-size:13px;color:var(--text);flex:1;" placeholder="Buscar..." value="fresas" oninput="filterResults(this.value)">
+        <svg class="ico" viewBox="0 0 24 24" width="14" height="14" style="color:var(--text3);cursor:pointer;" onclick="document.getElementById('search-input').value='';filterResults('')"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      <button onclick="go('s-search-results','s-filters')" style="width:40px;height:40px;border-radius:11px;background:var(--org);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+        <svg class="ico" viewBox="0 0 24 24" width="16" height="16" style="color:#fff"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="12" y1="18" x2="20" y2="18"/></svg>
+        <div id="filter-dot" style="display:none;position:absolute;top:5px;right:5px;width:7px;height:7px;background:#fff;border-radius:99px;"></div>
+      </button>
+    </div>
+    <!-- Tags de filtros activos -->
+    <div id="active-filters" style="padding:0 14px 10px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;"></div>
+    <!-- Chips de categoría -->
+    <div style="padding:0 14px 10px;display:flex;gap:6px;overflow-x:auto;flex-shrink:0;" class="chips">
+      <div class="chip on" onclick="searchChip(this)">Todos</div>
+      <div class="chip" onclick="searchChip(this)">Ropa</div>
+      <div class="chip" onclick="searchChip(this)">Agricultura</div>
+      <div class="chip" onclick="searchChip(this)">Animales</div>
+      <div class="chip" onclick="searchChip(this)">Servicios</div>
+      <div class="chip" onclick="searchChip(this)">Electrónicos</div>
+      <div class="chip" onclick="searchChip(this)">Artesanías</div>
+    </div>
+    <!-- Contador de resultados -->
+    <div style="padding:0 18px 8px;font-size:12px;color:var(--text3);flex-shrink:0;">
+      <span id="result-count">3 resultados para</span> <strong style="color:var(--text);">"fresas"</strong>
+    </div>
+    <div class="scroll pad" id="search-result-list">
+      <!-- Card 1 -->
+      <div class="pcard" data-tags="fresas agricultura mayoreo">
+        <div class="pav" style="background:#F0FDF4;color:#15803D;">RF</div>
+        <div class="pinfo">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div class="pname">Rancho El Fresno</div>
+            <svg class="ico" viewBox="0 0 24 24" width="12" height="12" style="color:var(--green);flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Michoacán · 42 km</div>
+          <div class="pcat">Agricultura</div>
+          <div class="stars-row">
+            <div class="stars"><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.9</span><span style="font-size:11px;color:var(--text3);">(128)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;" onclick="go('s-search-results','s-prov-profile')">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+      <!-- Card 2 -->
+      <div class="pcard" data-tags="fresas berries agricultura menudeo">
+        <div class="pav" style="background:#FFE4E6;color:#BE123C;">BM</div>
+        <div class="pinfo">
+          <div class="pname">Berries Morelos</div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Morelos · 28 km</div>
+          <div class="pcat">Agricultura</div>
+          <div class="stars-row">
+            <div class="stars"><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#E5E7EB"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">4.3</span><span style="font-size:11px;color:var(--text3);">(47)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+      <!-- Card 3 -->
+      <div class="pcard" data-tags="fresas frutas agricultura mayoreo 5estrellas">
+        <div class="pav" style="background:#FEF3C7;color:#B45309;">FP</div>
+        <div class="pinfo">
+          <div style="display:flex;align-items:center;gap:5px;">
+            <div class="pname">Frutería Premium MX</div>
+            <svg class="ico" viewBox="0 0 24 24" width="12" height="12" style="color:var(--green);flex-shrink:0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div class="ploc"><svg class="ico" viewBox="0 0 24 24" width="10" height="10"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Puebla · 6 km</div>
+          <div class="pcat">Agricultura</div>
+          <div class="stars-row">
+            <div class="stars"><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><svg viewBox="0 0 24 24" fill="#F59E0B"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <span style="font-size:11px;font-weight:700;color:var(--text);">5.0</span><span style="font-size:11px;color:var(--text3);">(89)</span>
+            <button class="btn btn-p btn-xs" style="margin-left:auto;">Ver perfil</button>
+          </div>
+        </div>
+      </div>
+      <!-- Sin resultados -->
+      <div id="no-results" style="display:none;text-align:center;padding:40px 20px;">
+        <svg class="ico" viewBox="0 0 24 24" width="36" height="36" style="color:var(--text3);margin-bottom:12px;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;">Sin resultados</div>
+        <div style="font-size:12px;color:var(--text3);">Intenta con otra palabra o ajusta los filtros</div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════ -->
+  <!-- PANEL DE FILTROS                  -->
+  <!-- ══════════════════════════════════ -->
+  <div class="screen" id="s-filters">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 18px 14px;flex-shrink:0;">
+      <button class="back-btn" onclick="go('s-filters','s-search-results')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <span style="font-size:16px;font-weight:800;color:var(--text);">Filtros</span>
+      <button onclick="clearFilters()" style="background:none;border:none;font-family:inherit;font-size:12px;font-weight:700;color:var(--org);cursor:pointer;">Limpiar todo</button>
+    </div>
+
+    <div class="scroll pad">
+
+      <!-- CATEGORÍA -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Categoría</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;" id="filter-cats">
+          <div class="chip on" onclick="filterChip(this)">Todos</div>
+          <div class="chip" onclick="filterChip(this)">Ropa</div>
+          <div class="chip" onclick="filterChip(this)">Agricultura</div>
+          <div class="chip" onclick="filterChip(this)">Animales</div>
+          <div class="chip" onclick="filterChip(this)">Servicios</div>
+          <div class="chip" onclick="filterChip(this)">Electrónicos</div>
+          <div class="chip" onclick="filterChip(this)">Artesanías</div>
+          <div class="chip" onclick="filterChip(this)">Muebles</div>
+          <div class="chip" onclick="filterChip(this)">Alimentos</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin-bottom:20px;"></div>
+
+      <!-- UBICACIÓN -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Ubicación</div>
+        <div style="display:flex;flex-wrap:wrap;gap:7px;" id="filter-loc">
+          <div class="chip on" onclick="filterChip(this)">Cerca de mí</div>
+          <div class="chip" onclick="filterChip(this)">En mi estado</div>
+          <div class="chip" onclick="filterChip(this)">Nacional</div>
+          <div class="chip" onclick="filterChip(this)">Solo online</div>
+        </div>
+        <!-- Slider de distancia -->
+        <div style="margin-top:12px;">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px;">
+            <span>Distancia máxima</span>
+            <span id="dist-label" style="font-weight:700;color:var(--org);">50 km</span>
+          </div>
+          <input type="range" min="5" max="500" step="5" value="50" style="width:100%;" oninput="document.getElementById('dist-label').textContent=this.value+' km'">
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin-bottom:20px;"></div>
+
+      <!-- TIPO DE VENTA -->
+      <div style="margin-bottom:22px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Tipo de venta</div>
+        <div style="display:flex;gap:7px;">
+          <div class="chip on" onclick="filterChip(this)">Ambos</div>
+          <div class="chip" onclick="filterChip(this)">Mayoreo</div>
+          <div class="chip" onclick="filterChip(this)">Menudeo</div>
+        </div>
+      </div>
+
+      <div style="height:1px;background:var(--border);margin-bottom:20px;"></div>
+
+      <!-- OTROS -->
+      <div style="margin-bottom:24px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Otros filtros</div>
+        <div style="display:flex;flex-direction:column;gap:0;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Solo verificados</div>
+              <div style="font-size:11px;color:var(--text3);">Proveedores con badge oficial</div>
+            </div>
+            <div id="tog-verified" onclick="toggleTog('tog-verified')" style="width:42px;height:24px;border-radius:99px;background:var(--org);cursor:pointer;position:relative;transition:background .2s;">
+              <div style="position:absolute;top:3px;right:3px;width:18px;height:18px;background:#fff;border-radius:99px;transition:transform .2s;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border);">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Acepta videollamada</div>
+              <div style="font-size:11px;color:var(--text3);">Puedes conocerlos antes de comprar</div>
+            </div>
+            <div id="tog-video" onclick="toggleTog('tog-video')" style="width:42px;height:24px;border-radius:99px;background:var(--gray-m);cursor:pointer;position:relative;transition:background .2s;">
+              <div style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:99px;transition:transform .2s;"></div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;">
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text);">Disponible hoy</div>
+              <div style="font-size:11px;color:var(--text3);">Tiene stock o servicio disponible</div>
+            </div>
+            <div id="tog-today" onclick="toggleTog('tog-today')" style="width:42px;height:24px;border-radius:99px;background:var(--gray-m);cursor:pointer;position:relative;transition:background .2s;">
+              <div style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:99px;transition:transform .2s;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-p" onclick="applyFilters()" style="margin-bottom:8px;">Ver resultados</button>
+      <div style="height:10px;"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- TÉRMINOS Y CONDICIONES               -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="screen" id="s-terms">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="display:flex;align-items:center;padding:4px 18px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="goBack('s-terms')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <span style="font-size:16px;font-weight:800;color:var(--text);flex:1;text-align:center;">Términos y condiciones</span>
+      <div style="width:56px;"></div>
+    </div>
+    <div class="scroll pad">
+      <!-- Header naranja -->
+      <div style="background:var(--org);border-radius:14px;padding:16px;margin-bottom:18px;text-align:center;">
+        <svg class="ico" viewBox="0 0 24 24" width="28" height="28" style="color:#fff;margin-bottom:6px;display:block;margin-left:auto;margin-right:auto;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        <div style="font-size:14px;font-weight:800;color:#fff;">¡Ven Ya! — Términos y condiciones</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px;">Última actualización: enero 2025</div>
+      </div>
+
+      <div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;">
+        Al usar la plataforma <strong style="color:var(--text);">¡Ven Ya!</strong> aceptas los presentes términos. Por favor léelos con atención antes de registrarte.
+      </div>
+
+      <!-- Sección 1 -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px;">1. Naturaleza de la plataforma</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">¡Ven Ya! es una plataforma de conexión entre compradores y proveedores. Actuamos exclusivamente como intermediario digital para facilitar el contacto entre las partes. No somos vendedor, proveedor, ni parte del contrato de compraventa.</div>
+      </div>
+
+      <!-- Sección IMPORTANTE — deslinde -->
+      <div style="background:#FFF4EE;border:1.5px solid var(--org);border-radius:12px;padding:14px;margin-bottom:18px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <svg class="ico" viewBox="0 0 24 24" width="20" height="20" style="color:var(--org);flex-shrink:0;margin-top:1px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--org2);margin-bottom:5px;">Deslinde de responsabilidad en envíos</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.7;"><strong style="color:var(--text);">¡Ven Ya! no se hace responsable</strong> por pérdidas, retrasos, daños, robos ni cualquier incidencia que ocurra durante el proceso de envío o entrega de productos entre proveedores y compradores.<br><br>El proceso logístico y las condiciones de envío son responsabilidad exclusiva del proveedor y del comprador. Recomendamos acordar por escrito los términos de entrega antes de realizar cualquier transacción.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sección 3 -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px;">3. Responsabilidad del proveedor</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">El proveedor es el único responsable de la calidad, veracidad de la información publicada, cumplimiento de pedidos, entrega de productos y atención al cliente. ¡Ven Ya! no garantiza la calidad ni autenticidad de los productos ofrecidos.</div>
+      </div>
+
+      <!-- Sección 4 -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px;">4. Responsabilidad del comprador</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">El comprador es responsable de verificar la información del proveedor antes de realizar cualquier pago o acuerdo. Se recomienda usar las herramientas de videollamada y reseñas disponibles en la plataforma para validar la confiabilidad del proveedor.</div>
+      </div>
+
+      <!-- Sección 5 -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px;">5. Aviso de privacidad (LFPDPPP)</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">De conformidad con la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, los datos que recopilamos (nombre, correo, teléfono, código postal) se usan exclusivamente para operar la plataforma y no son vendidos a terceros.</div>
+      </div>
+
+      <!-- Sección 6 -->
+      <div style="margin-bottom:18px;">
+        <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:6px;">6. Modificaciones</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.7;">¡Ven Ya! se reserva el derecho de modificar estos términos en cualquier momento. Los cambios se notificarán dentro de la aplicación con al menos 7 días de anticipación.</div>
+      </div>
+
+      <!-- Aceptar -->
+      <div style="background:var(--gray-l);border-radius:12px;padding:13px;margin-bottom:16px;display:flex;align-items:flex-start;gap:10px;">
+        <div id="ckbox" onclick="toggleCheck()" style="width:20px;height:20px;border-radius:5px;border:2px solid var(--border);background:#fff;flex-shrink:0;margin-top:1px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;"></div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;">He leído y acepto los Términos y condiciones y el Aviso de privacidad de ¡Ven Ya!</div>
+      </div>
+      <button class="btn btn-p" onclick="goBack('s-terms')">Aceptar y continuar</button>
+      <div style="height:20px;"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- EDITAR PERFIL (comprador)             -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="screen" id="s-edit-profile">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="go('s-edit-profile','s-buyer-myprofile')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <span style="font-size:16px;font-weight:800;color:var(--text);">Editar perfil</span>
+      <button id="save-btn" onclick="saveProfile()" style="background:var(--org);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">Guardar</button>
+    </div>
+    <div class="scroll pad">
+      <!-- FOTO DE PERFIL -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:22px;">
+        <div style="position:relative;margin-bottom:10px;">
+          <div id="profile-pic-display" style="width:80px;height:80px;border-radius:99px;background:var(--org-l);border:3px solid var(--org-ll);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;color:var(--org);overflow:hidden;">
+            <span id="profile-initials">MG</span>
+            <img id="profile-img-preview" style="display:none;width:100%;height:100%;object-fit:cover;" src="">
+          </div>
+          <label for="photo-upload" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--org);border-radius:99px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </label>
+          <input type="file" id="photo-upload" accept="image/*" style="display:none;" onchange="previewPhoto(this)">
+        </div>
+        <div style="font-size:12px;color:var(--org);font-weight:700;cursor:pointer;" onclick="document.getElementById('photo-upload').click()">Cambiar foto de perfil</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">JPG o PNG, máximo 5 MB</div>
+      </div>
+
+      <!-- CAMPOS -->
+      <div class="ig">
+        <span class="lbl">Nombre completo</span>
+        <input class="inp" id="edit-name" value="María González">
+      </div>
+      <div class="ig">
+        <span class="lbl">Correo electrónico</span>
+        <input class="inp" id="edit-email" value="maria@gmail.com" type="email">
+      </div>
+      <div class="ig">
+        <span class="lbl">Teléfono</span>
+        <input class="inp" id="edit-phone" value="2381234567" type="tel">
+      </div>
+      <div class="ig">
+        <span class="lbl">Estado</span>
+        <select class="inp" id="edit-state">
+          <option selected>Puebla</option><option>CDMX</option><option>Jalisco</option><option>Michoacán</option><option>Veracruz</option>
+        </select>
+      </div>
+      <div class="ig">
+        <span class="lbl">Municipio</span>
+        <input class="inp" id="edit-city" value="Tehuacán">
+      </div>
+      <div class="ig">
+        <span class="lbl">Código postal</span>
+        <input class="inp" id="edit-zip" value="75700" type="number">
+      </div>
+      <div class="ig">
+        <span class="lbl">Contraseña nueva <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text3);font-size:10px;">(opcional)</span></span>
+        <div class="inp-wrap">
+          <svg class="ico" viewBox="0 0 24 24" style="color:var(--text3)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="inp" placeholder="Dejar en blanco para no cambiar" type="password">
+        </div>
+      </div>
+
+      <!-- Términos link -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="go('s-edit-profile','s-terms')">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Términos y condiciones</div>
+          <div style="font-size:11px;color:var(--text3);">Aviso de privacidad y deslinde de envíos</div>
+        </div>
+        <svg class="ico" viewBox="0 0 24 24" width="14" height="14" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+
+      <!-- Zona de peligro -->
+      <div style="margin-top:8px;padding:13px 0;border-top:1px solid var(--border);">
+        <div style="font-size:12px;color:#E11D48;font-weight:700;cursor:pointer;">Eliminar mi cuenta</div>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <!-- Toast de guardado -->
+    <div id="save-toast" style="display:none;position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:99px;white-space:nowrap;z-index:99;">Cambios guardados</div>
+  </div>
+
+  <!-- ══════════════════════════════════════ -->
+  <!-- EDITAR PERFIL PROVEEDOR               -->
+  <!-- ══════════════════════════════════════ -->
+  <div class="screen" id="s-edit-prov">
+    <div class="sb"><span class="time">9:41</span></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 18px 12px;flex-shrink:0;">
+      <button class="back-btn" onclick="go('s-edit-prov','s-prov-myprofile')">
+        <svg class="ico" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Volver
+      </button>
+      <span style="font-size:16px;font-weight:800;color:var(--text);">Editar perfil</span>
+      <button onclick="saveProvProfile()" style="background:var(--org);color:#fff;border:none;border-radius:9px;padding:7px 14px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">Guardar</button>
+    </div>
+    <div class="scroll pad">
+      <!-- FOTO / LOGO -->
+      <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:22px;">
+        <div style="position:relative;margin-bottom:10px;">
+          <div id="prov-pic-display" style="width:80px;height:80px;border-radius:20px;background:#F0FDF4;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#15803D;overflow:hidden;">
+            <span id="prov-initials">RF</span>
+            <img id="prov-img-preview" style="display:none;width:100%;height:100%;object-fit:cover;" src="">
+          </div>
+          <label for="prov-photo-upload" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:var(--org);border-radius:99px;border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </label>
+          <input type="file" id="prov-photo-upload" accept="image/*" style="display:none;" onchange="previewProvPhoto(this)">
+        </div>
+        <div style="font-size:12px;color:var(--org);font-weight:700;cursor:pointer;" onclick="document.getElementById('prov-photo-upload').click()">Cambiar foto o logo</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:3px;">JPG, PNG o SVG, máximo 5 MB</div>
+      </div>
+
+      <div class="ig">
+        <span class="lbl">Nombre del negocio</span>
+        <input class="inp" value="Rancho El Fresno">
+      </div>
+      <div class="ig">
+        <span class="lbl">Descripción breve</span>
+        <textarea class="inp" rows="3" style="resize:none;line-height:1.5;">Frutas de la Meseta Purépecha. Mayoreo y menudeo. Envíos a toda la república.</textarea>
+      </div>
+      <div class="ig">
+        <span class="lbl">Categoría principal</span>
+        <select class="inp">
+          <option selected>Agricultura</option><option>Ropa</option><option>Animales</option><option>Electrónicos</option><option>Artesanías</option><option>Servicios</option>
+        </select>
+      </div>
+      <div class="ig">
+        <span class="lbl">Estado</span>
+        <select class="inp"><option selected>Michoacán</option><option>Puebla</option><option>CDMX</option><option>Jalisco</option></select>
+      </div>
+      <div class="ig">
+        <span class="lbl">Municipio</span>
+        <input class="inp" value="Uruapan">
+      </div>
+      <div class="ig">
+        <span class="lbl">Código postal</span>
+        <input class="inp" value="60000" type="number">
+      </div>
+      <div class="ig">
+        <span class="lbl">Teléfono de contacto</span>
+        <input class="inp" value="4521234567" type="tel">
+      </div>
+      <div class="ig">
+        <span class="lbl">Correo de negocio</span>
+        <input class="inp" value="ventas@ranchoelfresno.mx" type="email">
+      </div>
+
+      <!-- Tipo de venta -->
+      <div class="ig">
+        <span class="lbl">Tipo de venta</span>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <div class="chip on" onclick="toggleVenta(this)" style="flex:1;text-align:center;">Mayoreo</div>
+          <div class="chip on" onclick="toggleVenta(this)" style="flex:1;text-align:center;">Menudeo</div>
+        </div>
+      </div>
+
+      <!-- Términos -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-top:1px solid var(--border);cursor:pointer;" onclick="go('s-edit-prov','s-terms')">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--text);">Términos y condiciones</div>
+          <div style="font-size:11px;color:var(--text3);">Aviso de privacidad y deslinde de envíos</div>
+        </div>
+        <svg class="ico" viewBox="0 0 24 24" width="14" height="14" style="color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div style="height:16px;"></div>
+    </div>
+    <div id="save-toast-prov" style="display:none;position:absolute;bottom:90px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12px;font-weight:700;padding:10px 18px;border-radius:99px;white-space:nowrap;z-index:99;">Cambios guardados</div>
+  </div>
+
+</div><!-- /phone -->
+
+<script>
+let currentMode = 'buyer';
+
+// Splash auto-advance
+setTimeout(() => go('s-splash', 's-auth'), 1800);
+
+function go(from, to) {
+  const f = document.getElementById(from);
+  const t = document.getElementById(to);
+  if (f) f.classList.remove('active');
+  if (t) t.classList.add('active');
+}
+
+function loginAs() {
+  if (currentMode === 'buyer') {
+    hideAll();
+    document.getElementById('s-buyer-home').classList.add('active');
+  } else {
+    hideAll();
+    document.getElementById('s-prov-home').classList.add('active');
+  }
+}
+
+function hideAll() {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+}
+
+function setMode(mode) {
+  currentMode = mode;
+  document.getElementById('btn-buyer').classList.toggle('active', mode === 'buyer');
+  document.getElementById('btn-prov').classList.toggle('active', mode === 'prov');
+  hideAll();
+  if (mode === 'buyer') {
+    document.getElementById('s-auth').classList.add('active');
+  } else {
+    document.getElementById('s-prov-home').classList.add('active');
+  }
+}
+
+function buyerNav(screenId, btnId) {
+  const buyerScreens = ['s-buyer-home','s-buyer-chat','s-buyer-myprofile'];
+  buyerScreens.forEach(id => {
+    const s = document.getElementById(id);
+    if (s) s.classList.remove('active');
+  });
+  document.querySelectorAll('#s-buyer-home .bnav .bn, #s-buyer-chat .bnav .bn, #s-buyer-myprofile .bnav .bn').forEach(b => b.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+}
+
+function provNav(screenId, btnId) {
+  const provScreens = ['s-prov-home','s-prov-chat','s-prov-myprofile'];
+  provScreens.forEach(id => {
+    const s = document.getElementById(id);
+    if (s) s.classList.remove('active');
+  });
+  document.querySelectorAll('#s-prov-home .bnav .bn, #s-prov-chat .bnav .bn, #s-prov-myprofile .bnav .bn').forEach(b => b.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  const btn = document.getElementById(btnId);
+  if (btn) btn.classList.add('active');
+}
+
+
+// track which screen opened terms
+let termsFrom = 's-buyer-myprofile';
+function goBack(from) {
+  go(from, termsFrom);
+}
+
+function previewPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('profile-initials').style.display = 'none';
+    const img = document.getElementById('profile-img-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function previewProvPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('prov-initials').style.display = 'none';
+    const img = document.getElementById('prov-img-preview');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function saveProfile() {
+  const toast = document.getElementById('save-toast');
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+    go('s-edit-profile', 's-buyer-myprofile');
+  }, 1400);
+}
+
+function saveProvProfile() {
+  const toast = document.getElementById('save-toast-prov');
+  toast.style.display = 'block';
+  setTimeout(() => {
+    toast.style.display = 'none';
+    go('s-edit-prov', 's-prov-myprofile');
+  }, 1400);
+}
+
+let ckChecked = false;
+function toggleCheck() {
+  ckChecked = !ckChecked;
+  const b = document.getElementById('ckbox');
+  b.style.background = ckChecked ? 'var(--org)' : '#fff';
+  b.style.borderColor = ckChecked ? 'var(--org)' : 'var(--border)';
+  b.innerHTML = ckChecked ? '<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' : '';
+}
+
+function toggleVenta(el) { el.classList.toggle('on'); }
+
+function authTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('panel-login').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('panel-register').style.display = isLogin ? 'none' : 'block';
+  document.getElementById('tab-login').style.background = isLogin ? 'var(--org)' : 'transparent';
+  document.getElementById('tab-login').style.color = isLogin ? '#fff' : 'var(--text2)';
+  document.getElementById('tab-register').style.background = isLogin ? 'transparent' : 'var(--org)';
+  document.getElementById('tab-register').style.color = isLogin ? 'var(--text2)' : '#fff';
+}
+
+function selRole(role) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('rc-' + role).classList.add('sel');
+  currentMode = role === 'prov' ? 'prov' : 'buyer';
+}
+
+function selPlan(plan) {
+  document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('sel'));
+  document.getElementById('plan-' + plan).classList.add('sel');
+}
+
+function filterChip(el) {
+  el.classList.toggle('on');
+}
+
+function searchChip(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function setStars(btn, n) {
+  document.querySelectorAll('.filter-star-btn').forEach(b => {
+    b.style.border = '1.5px solid var(--border)';
+    b.style.background = '#fff';
+    b.style.color = 'var(--text2)';
+  });
+  btn.style.border = '1.5px solid var(--org)';
+  btn.style.background = 'var(--org-l)';
+  btn.style.color = 'var(--org2)';
+}
+
+function toggleTog(id) {
+  const tog = document.getElementById(id);
+  const dot = tog.querySelector('div');
+  const isOn = tog.style.background.includes('F97316') || tog.style.background === 'var(--org)';
+  if (isOn) {
+    tog.style.background = 'var(--gray-m)';
+    dot.style.transform = 'translateX(0)';
+  } else {
+    tog.style.background = 'var(--org)';
+    dot.style.transform = 'translateX(18px)';
+  }
+}
+
+function applyFilters() {
+  document.getElementById('filter-dot').style.display = 'block';
+  go('s-filters', 's-search-results');
+  const tag = document.createElement('div');
+  tag.style.cssText = 'padding:4px 10px;background:var(--org-l);color:var(--org2);border-radius:99px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;cursor:pointer;white-space:nowrap;';
+  tag.innerHTML = 'Solo 5★ · Verificados <span onclick="this.parentElement.remove()">✕</span>';
+  const af = document.getElementById('active-filters');
+  if (af && af.children.length === 0) af.appendChild(tag);
+}
+
+function clearFilters() {
+  document.querySelectorAll('#filter-cats .chip, #filter-loc .chip').forEach((c,i) => {
+    c.classList.toggle('on', i === 0);
+  });
+  document.querySelectorAll('.filter-star-btn').forEach(b => {
+    b.style.border = '1.5px solid var(--border)';
+    b.style.background = '#fff';
+    b.style.color = 'var(--text2)';
+  });
+}
+
+function filterResults(val) {
+  const cards = document.querySelectorAll('#search-result-list .pcard');
+  let visible = 0;
+  cards.forEach(c => {
+    const tags = (c.dataset.tags || '') + ' ' + (c.querySelector('.pname')?.textContent || '');
+    const match = !val || tags.toLowerCase().includes(val.toLowerCase());
+    c.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+  const nr = document.getElementById('no-results');
+  if (nr) nr.style.display = visible === 0 ? 'block' : 'none';
+  const rc = document.getElementById('result-count');
+  if (rc) rc.textContent = visible + ' resultado' + (visible !== 1 ? 's' : '') + ' para';
+}
+
+function toggleChip(el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+}
+</script>
+</body>
+</html>
